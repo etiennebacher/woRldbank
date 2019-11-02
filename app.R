@@ -128,7 +128,6 @@ ui <- navbarPage(theme = shinytheme("flatly"),
                  
                  tabPanel(title = "Fusion et exportation",
                           fluidRow(
-                            column(width = 2,
                                    dropdownButton(
                                      tags$h3("Fusionner les bases"),
                                      selectInput(inputId = "choix_fusion",
@@ -140,9 +139,10 @@ ui <- navbarPage(theme = shinytheme("flatly"),
                                      icon = icon("gear"),
                                      width = "300px",
                                      tooltip = tooltipOptions(title = "Outils")
-                                   )),
-                            column(width = 10)
-                          ))
+                                   ),
+                                   column(12,
+                                          dataTableOutput("data_merged")))
+                          )
                  
                  ##### ONGLETS PLUS ET MOINS #####
                  ,
@@ -658,6 +658,11 @@ server <- function(input, output, session) {
   
   
   ##### PARTIE FUSION #####
+  
+  output$data_merged <- renderDataTable({
+    
+  })
+  
 }
 
 
