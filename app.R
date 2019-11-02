@@ -6,6 +6,8 @@ library(DT)
 library(dplyr)
 library(shinysky)
 
+# machin
+
 ui <- navbarPage(theme = shinytheme("flatly"), 
                  title = strong("Traitement des données de la Banque Mondiale"),
                  id = "tabs",
