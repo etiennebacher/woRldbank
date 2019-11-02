@@ -6,13 +6,6 @@ library(DT)
 library(dplyr)
 library(shinysky)
 
-### TO-DO LIST :
-### - faire un bouton "remove" qui permet de supprimer le dernier onglet créé -> A AMELIORER
-### - si jamais je dis qu'on ne peut importer que dix bases différentes, alors utiliser
-###   hideTab() pour cacher le bouton "More"
-### - dans l'onglet "Fusion et exportation", faire en sorte qu'on ne puisse sélectionner
-###   que les bases déja créées
-
 ui <- navbarPage(theme = shinytheme("flatly"), 
                  title = strong("Traitement des données de la Banque Mondiale"),
                  id = "tabs",
