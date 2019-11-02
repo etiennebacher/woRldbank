@@ -257,65 +257,79 @@ server <- function(input, output, session) {
   ##### PARTIE IMPORTATION, TRAITEMENT ET DONNEES ##### 
   
   #### BASE 1 ####
-  ### IMPORTATION
-  data_wb_tab1 <- eventReactive(input$import, {
-    tmp <- as.data.frame(WDI(country = "all", indicator = input$nom_base))
-    colnames(tmp) <- c("Code ISO", "Pays", input$nouveau_nom, "Année")
-    tmp
-  })
+  
+  ### essai d'une fonction pour écrire une seule fois le code d'importation et traitement
+  
+  import_and_treat <- function(i){
+    
+    ### IMPORTATION
+    paste0("data_wb_tab", i, sep = "") <- eventReactive(paste0("input$import", i, sep = ""), {
+      tmp <- as.data.frame(WDI(country = "all", indicator = paste0("input$nom_base", i, sep = "")))
+      colnames(tmp) <- c("Code ISO", "Pays", paste0("input$nouveau_nom", i, sep = ""), "Année")
+      tmp
+    })
+  }
   
   ### INPUTS PAYS ET ANNEES
   observe({
-    data_wb_tab1 <- data_wb_tab1()
-    if(input$choix == "Coupe transversale"){
+    paste0("data_wb_tab", i, sep = "") <- paste0("data_wb_tab", i, sep = "")()
+    if(paste0("input$choix", i, sep = "") == "Coupe transversale"){
       updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab1$Pays), 
+                           inputId = paste0("pays", i, sep = ""), 
+                           choices = unique(paste0("data_wb_tab", i, sep = "")$Pays), 
                            selected = NULL)
       updateSelectizeInput(session, 
-                           inputId = "année", 
-                           choices = unique(data_wb_tab1$Année), 
+                           inputId = paste0("année", i, sep = ""), 
+                           choices = unique(paste0("data_wb_tab", i, sep = "")$Année), 
                            selected = NULL,
                            options = list(maxItems = 1))
     }
     else if(input$choix == "Série temporelle"){
       updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab1$Pays),
+                           inputId = paste0("pays", i, sep = ""), 
+                           choices = unique(paste0("data_wb_tab", i, sep = "")$Pays),
                            selected = NULL,
                            options = list(maxItems = 1))
       updateSliderInput(session,
-                        inputId = "année2",
-                        min = min(data_wb_tab1$Année),
-                        max = max(data_wb_tab1$Année),
-                        value = c(min(data_wb_tab1$Année), 
-                                  max(data_wb_tab1$Année)),
+                        inputId = paste0("année", i + 1, sep = ""),
+                        min = min(paste0("data_wb_tab", i, sep = "")$Année),
+                        max = max(paste0("data_wb_tab", i, sep = "")$Année),
+                        value = c(min(paste0("data_wb_tab", i, sep = "")$Année), 
+                                  max(paste0("data_wb_tab", i, sep = "")$Année)),
                         step = 1
       )
     }
     else if (input$choix == "Données de panel"){
       updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab1$Pays),
+                           inputId = paste0("pays", i, sep = ""), 
+                           choices = unique(paste0("data_wb_tab", i, sep = "")$Pays),
                            selected = NULL,
                            options = list(maxItems = 999999))
       updateSliderInput(session,
-                        inputId = "année2",
-                        min = min(data_wb_tab1$Année),
-                        max = max(data_wb_tab1$Année),
-                        value = c(min(data_wb_tab1$Année), 
-                                  max(data_wb_tab1$Année)),
+                        inputId = paste0("année", i + 1, sep = ""),
+                        min = min(paste0("data_wb_tab", i, sep = "")$Année),
+                        max = max(paste0("data_wb_tab", i, sep = "")$Année),
+                        value = c(min(paste0("data_wb_tab", i, sep = "")$Année), 
+                                  max(paste0("data_wb_tab", i, sep = "")$Année)),
                         step = 1
       )
     }
   })
   
-  
   ### DONNEES AFFICHEES
-  output$data_imported_tab1 <- renderDataTable({
-    data_wb_tab1 <- data_wb_tab1()
-    log_name <- paste0('ln(', input$nouveau_nom, ')')
-    square_name <- paste0(input$nouveau_nom, '^2')
+  output$paste0("data_imported_tab", i, sep = "") <- renderDataTable({
+    paste0("data_wb_tab", i, sep = "") <- paste0("data_wb_tab", i, sep = "")()
+    log_name <- paste0('ln(', 
+                       paste0("input$nouveau_nom", i, sep = ""),
+                       ')')
+    square_name <- paste0(paste0("input$nouveau_nom", i),
+                          '^2')
+    
+    
+    ### ARRET ICI de la construction de la fonction
+    
+    
+    
     
     ## Trois situations possibles : les données sont en coupe transversale, en série temporelle ou
     ## en données de panel.
