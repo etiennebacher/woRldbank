@@ -6,8 +6,6 @@ library(DT)
 library(dplyr)
 library(shinysky)
 
-# un autre truc
-
 ui <- navbarPage(theme = shinytheme("flatly"), 
                  title = strong("Traitement des données de la Banque Mondiale"),
                  id = "tabs",
@@ -128,7 +126,6 @@ ui <- navbarPage(theme = shinytheme("flatly"),
                  
                  ##### ONGLET FUSION #####
                  
-                 ### ONGLET 3
                  tabPanel(title = "Fusion et exportation",
                           fluidRow(
                             column(width = 2,
@@ -149,9 +146,9 @@ ui <- navbarPage(theme = shinytheme("flatly"),
                  
                  ##### ONGLETS PLUS ET MOINS #####
                  ,
-                 tabPanel(title = "Ajouter une base",
+                 tabPanel(title = "Plus",
                           icon = icon("plus")),
-                 tabPanel(title = "Retirer une base",
+                 tabPanel(title = "Moins",
                           icon = icon("minus"))
                  
                  
@@ -167,7 +164,7 @@ server <- function(input, output, session) {
   count <- reactiveValues(value = 1)
   
   observeEvent(input$tabs, {
-    if (input$tabs == "Ajouter une base"){
+    if (input$tabs == "Plus"){
       count$value <- count$value + 1
       id = paste0("Base ", count$value)
       insertTab(inputId = "tabs",
@@ -246,7 +243,7 @@ server <- function(input, output, session) {
                          )), target = "Fusion et exportation", 
                 position = "before",
                 select = TRUE)}
-    if (input$tabs == "Retirer une base"){
+    if (input$tabs == "Moins"){
       id = paste0("Base ", count$value)
       removeTab(inputId = "tabs",
                 target = id
@@ -659,6 +656,8 @@ server <- function(input, output, session) {
   )
   
   
+  
+  ##### PARTIE FUSION #####
 }
 
 
