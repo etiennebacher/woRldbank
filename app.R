@@ -97,7 +97,9 @@ server <- function(input, output, session) {
         colnames(tmp) <- c("Code ISO", "Pays", paste0("input$nouveau_nom", i), "Année")
         tmp
       }
-      else{}
+      else{
+        tmp <- NULL
+      }
     }))
     
     ### INPUTS PAYS ET ANNEES
