@@ -89,55 +89,62 @@ server <- function(input, output, session) {
   ### essai d'une fonction pour écrire une seule fois le code d'importation et traitement
   
   import_and_treat <- function(i){
-    
+
     ### IMPORTATION
     assign(paste0("data_wb_tab", i), eventReactive(paste0("input$import", i), {
-      tmp <- as.data.frame(WDI(country = "all", indicator = paste0("input$nom_base", i)))
-      colnames(tmp) <- c("Code ISO", "Pays", paste0("input$nouveau_nom", i), "Année")
-      tmp
+      if(!is.null(paste0("input$nom_base", i))){
+        tmp <- as.data.frame(WDI(country = "all", indicator = get(paste0("input$nom_base", i))))
+        colnames(tmp) <- c("Code ISO", "Pays", paste0("input$nouveau_nom", i), "Année")
+        tmp
+      }
+      else{
+        tmp <- NULL
+        }
     }))
+    
+    if (!is.null(paste0("data_wb", i))){
 
     ### INPUTS PAYS ET ANNEES
     observe({
-      paste0("data_wb_tab", i) <- paste0("data_wb_tab", i)()
+      get(paste0("data_wb_tab", i)) <- get(paste0("data_wb_tab", i))()
       if(paste0("input$choix", i) == "Coupe transversale"){
         updateSelectizeInput(session,
                              inputId = paste0("pays", i),
-                             choices = unique(paste0("data_wb_tab", i)$Pays),
+                             choices = unique(get(paste0("data_wb_tab", i))$Pays),
                              selected = NULL)
         updateSelectizeInput(session,
                              inputId = paste0("année", i),
-                             choices = unique(paste0("data_wb_tab", i)$Année),
+                             choices = unique(get(paste0("data_wb_tab", i))$Année),
                              selected = NULL,
                              options = list(maxItems = 1))
       }
       else if(input$choix == "Série temporelle"){
         updateSelectizeInput(session,
                              inputId = paste0("pays", i),
-                             choices = unique(paste0("data_wb_tab", i)$Pays),
+                             choices = unique(get(paste0("data_wb_tab", i))$Pays),
                              selected = NULL,
                              options = list(maxItems = 1))
         updateSliderInput(session,
                           inputId = paste0("année2", i),
-                          min = min(paste0("data_wb_tab", i)$Année),
-                          max = max(paste0("data_wb_tab", i)$Année),
-                          value = c(min(paste0("data_wb_tab", i)$Année),
-                                    max(paste0("data_wb_tab", i)$Année)),
+                          min = min(get(paste0("data_wb_tab", i))$Année),
+                          max = max(get(paste0("data_wb_tab", i))$Année),
+                          value = c(min(get(paste0("data_wb_tab", i))$Année),
+                                    max(get(paste0("data_wb_tab", i))$Année)),
                           step = 1
         )
       }
       else if (input$choix == "Données de panel"){
         updateSelectizeInput(session,
                              inputId = paste0("pays", i),
-                             choices = unique(paste0("data_wb_tab", i)$Pays),
+                             choices = unique(get(paste0("data_wb_tab", i))$Pays),
                              selected = NULL,
                              options = list(maxItems = 999999))
         updateSliderInput(session,
                           inputId = paste0("année2", i),
-                          min = min(paste0("data_wb_tab", i)$Année),
-                          max = max(paste0("data_wb_tab", i)$Année),
-                          value = c(min(paste0("data_wb_tab", i)$Année),
-                                    max(paste0("data_wb_tab", i)$Année)),
+                          min = min(get(paste0("data_wb_tab", i))$Année),
+                          max = max(get(paste0("data_wb_tab", i))$Année),
+                          value = c(min(get(paste0("data_wb_tab", i))$Année),
+                                    max(get(paste0("data_wb_tab", i))$Année)),
                           step = 1
         )
       }
@@ -224,7 +231,7 @@ server <- function(input, output, session) {
         paste0("data_wb", i) %>%
           filter(Pays %in% paste0("pays", i)  &
                    Année >= paste0("année2", i)[[1]] &
-                   Année <= paste0("année2", i))[[2]]) %>%
+                   Année <= paste0("année2", i)[[2]]) %>%
           arrange(Pays, Année)
 
         if(input$logarithme) {
@@ -353,6 +360,7 @@ server <- function(input, output, session) {
     options = list(pageLength = 999999)
     )
 
+    }
   }
   
   ##### PARTIE INTERACTIVITE DE L'UI ##### 
@@ -436,234 +444,237 @@ server <- function(input, output, session) {
                                                 wait = 0),
                                   dataTableOutput(paste0("data_imported_tab", count$value))
                            )
-                         )), target = "Fusion et exportation", 
+                         )), 
+                target = "Fusion et exportation", 
                 position = "before",
                 select = TRUE)
+      
       import_and_treat(i = count$value)
-      }
+    }
+    
     if (input$tabs == "Moins"){
       id = paste0("Base ", count$value)
       removeTab(inputId = "tabs",
                 target = id
       )
       
-      count$value <- count$value -1
+      count$value <- count$value - 1
     }
   })
   
   
-  ##### PARTIE IMPORTATION, TRAITEMENT ET DONNEES ##### 
-  
-  #### BASE 1 ####
-  
-  
-  #### BASE 2 ####
-  
-  
-  ### IMPORTATION
-  data_wb_tab2 <- eventReactive(input$import2, {
-    tmp <- as.data.frame(WDI(country = "all", indicator = input$nom_base2))
-    colnames(tmp) <- c("Code ISO", "Pays", input$nouveau_nom2, "Année")
-    tmp
-  })
-  
-  ### INPUTS PAYS ET ANNEES
-  observe({
-    data_wb_tab2 <- data_wb_tab2()
-    if(input$choix == "Coupe transversale"){
-      updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab2$Pays), 
-                           selected = NULL)
-      updateSelectizeInput(session, 
-                           inputId = "année", 
-                           choices = unique(data_wb_tab2$Année), 
-                           selected = NULL,
-                           options = list(maxItems = 1))
-    }
-    else if(input$choix == "Série temporelle"){
-      updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab2$Pays),
-                           selected = NULL,
-                           options = list(maxItems = 1))
-      updateSliderInput(session,
-                        inputId = "année2",
-                        min = min(data_wb_tab2$Année),
-                        max = max(data_wb_tab2$Année),
-                        value = c(min(data_wb_tab2$Année), 
-                                  max(data_wb_tab2$Année)),
-                        step = 1
-      )
-    }
-    else if (input$choix == "Données de panel"){
-      updateSelectizeInput(session, 
-                           inputId = "pays", 
-                           choices = unique(data_wb_tab2$Pays),
-                           selected = NULL,
-                           options = list(maxItems = 999999))
-      updateSliderInput(session,
-                        inputId = "année2",
-                        min = min(data_wb_tab2$Année),
-                        max = max(data_wb_tab2$Année),
-                        value = c(min(data_wb_tab2$Année), 
-                                  max(data_wb_tab2$Année)),
-                        step = 1
-      )
-    }
-  })
-  
-  
-  ### DONNEES AFFICHEES
-  output$data_imported_tab2 <- renderDataTable({
-    data_wb_tab2 <- data_wb_tab2()
-    log_name <- paste0('ln(', input$nouveau_nom, ')')
-    square_name <- paste0(input$nouveau_nom, '^2')
-    
-    ## Trois situations possibles : les données sont en coupe transversale, en série temporelle ou
-    ## en données de panel.
-    ## Dans chacune de ces trois situations, on détaille toutes les associations possibles
-    ## de logarithme et carré, pour que l'ordre dans lequel on coche ne change rien.
-    
-    if(input$choix == "Coupe transversale"){
-      data_wb2 <- data_wb_tab2 %>%
-        filter(Pays %in% input$pays & Année %in% input$année) %>%
-        arrange(Pays, Année)
-      
-      if(input$logarithme){
-        if(input$carré){
-          data_wb3 <- data_wb2 %>%
-            mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb3
-        }
-        else {
-          data_wb3 <- data_wb2 %>%
-            mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
-          
-          data_wb3
-        }
-      }
-      else if (input$carré){
-        if (input$logarithme){
-          data_wb3 <- data_wb2 %>%
-            mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb3
-        }
-        else {
-          data_wb3 <- data_wb2 %>%
-            mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
-          
-          data_wb3
-        }
-      }
-      else {data_wb2}
-    }
-    else if(input$choix == "Série temporelle"){
-      data_wb4 <- data_wb_tab2 %>%
-        filter(Pays %in% input$pays & 
-                 Année >= input$année2[[1]] &
-                 Année <= input$année2[[2]]) %>%
-        arrange(Pays, Année)
-      
-      if(input$logarithme) {
-        if (input$carré){
-          data_wb5 <- data_wb4 %>%
-            mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb5
-        }
-        else {
-          data_wb5 <- data_wb4 %>%
-            mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
-          
-          data_wb5
-        }
-      }
-      else if (input$carré){
-        if (input$logarithme){
-          data_wb5 <- data_wb4 %>%
-            mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb5
-        }
-        else {
-          data_wb5 <- data_wb4 %>%
-            mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
-          
-          data_wb5
-        }
-      }
-      else {data_wb4}
-    }
-    else if(input$choix == "Données de panel"){
-      data_wb6 <- data_wb_tab2 %>%
-        filter(Pays %in% input$pays & 
-                 Année >= input$année2[[1]] &
-                 Année <= input$année2[[2]]) %>%
-        arrange(Pays, Année)
-      
-      if(input$logarithme) {
-        if (input$carré){
-          data_wb7 <- data_wb6 %>%
-            mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb7
-        }
-        else {
-          data_wb7 <- data_wb6 %>%
-            mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
-          
-          data_wb7
-        }
-      }
-      else if (input$carré){
-        if (input$logarithme) {
-          data_wb7 <- data_wb6 %>%
-            mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
-            mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
-          
-          data_wb7
-        } 
-        else {
-          data_wb7 <- data_wb6 %>%
-            mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
-            select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
-          
-          data_wb7
-        }
-      }
-      else {data_wb6}
-    }
-  },
-  options = list(pageLength = 999999)
-  )
-  
-  
-  
-  ##### PARTIE FUSION #####
-  
-  output$data_merged <- renderDataTable({
-    
-  })
-  
+  # ##### PARTIE IMPORTATION, TRAITEMENT ET DONNEES ##### 
+  # 
+  # #### BASE 1 ####
+  # 
+  # 
+  # #### BASE 2 ####
+  # 
+  # 
+  # ### IMPORTATION
+  # data_wb_tab2 <- eventReactive(input$import2, {
+  #   tmp <- as.data.frame(WDI(country = "all", indicator = input$nom_base2))
+  #   colnames(tmp) <- c("Code ISO", "Pays", input$nouveau_nom2, "Année")
+  #   tmp
+  # })
+  # 
+  # ### INPUTS PAYS ET ANNEES
+  # observe({
+  #   data_wb_tab2 <- data_wb_tab2()
+  #   if(input$choix == "Coupe transversale"){
+  #     updateSelectizeInput(session, 
+  #                          inputId = "pays", 
+  #                          choices = unique(data_wb_tab2$Pays), 
+  #                          selected = NULL)
+  #     updateSelectizeInput(session, 
+  #                          inputId = "année", 
+  #                          choices = unique(data_wb_tab2$Année), 
+  #                          selected = NULL,
+  #                          options = list(maxItems = 1))
+  #   }
+  #   else if(input$choix == "Série temporelle"){
+  #     updateSelectizeInput(session, 
+  #                          inputId = "pays", 
+  #                          choices = unique(data_wb_tab2$Pays),
+  #                          selected = NULL,
+  #                          options = list(maxItems = 1))
+  #     updateSliderInput(session,
+  #                       inputId = "année2",
+  #                       min = min(data_wb_tab2$Année),
+  #                       max = max(data_wb_tab2$Année),
+  #                       value = c(min(data_wb_tab2$Année), 
+  #                                 max(data_wb_tab2$Année)),
+  #                       step = 1
+  #     )
+  #   }
+  #   else if (input$choix == "Données de panel"){
+  #     updateSelectizeInput(session, 
+  #                          inputId = "pays", 
+  #                          choices = unique(data_wb_tab2$Pays),
+  #                          selected = NULL,
+  #                          options = list(maxItems = 999999))
+  #     updateSliderInput(session,
+  #                       inputId = "année2",
+  #                       min = min(data_wb_tab2$Année),
+  #                       max = max(data_wb_tab2$Année),
+  #                       value = c(min(data_wb_tab2$Année), 
+  #                                 max(data_wb_tab2$Année)),
+  #                       step = 1
+  #     )
+  #   }
+  # })
+  # 
+  # 
+  # ### DONNEES AFFICHEES
+  # output$data_imported_tab2 <- renderDataTable({
+  #   data_wb_tab2 <- data_wb_tab2()
+  #   log_name <- paste0('ln(', input$nouveau_nom, ')')
+  #   square_name <- paste0(input$nouveau_nom, '^2')
+  #   
+  #   ## Trois situations possibles : les données sont en coupe transversale, en série temporelle ou
+  #   ## en données de panel.
+  #   ## Dans chacune de ces trois situations, on détaille toutes les associations possibles
+  #   ## de logarithme et carré, pour que l'ordre dans lequel on coche ne change rien.
+  #   
+  #   if(input$choix == "Coupe transversale"){
+  #     data_wb2 <- data_wb_tab2 %>%
+  #       filter(Pays %in% input$pays & Année %in% input$année) %>%
+  #       arrange(Pays, Année)
+  #     
+  #     if(input$logarithme){
+  #       if(input$carré){
+  #         data_wb3 <- data_wb2 %>%
+  #           mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb3
+  #       }
+  #       else {
+  #         data_wb3 <- data_wb2 %>%
+  #           mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
+  #         
+  #         data_wb3
+  #       }
+  #     }
+  #     else if (input$carré){
+  #       if (input$logarithme){
+  #         data_wb3 <- data_wb2 %>%
+  #           mutate(!!log_name := log(data_wb2[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb3
+  #       }
+  #       else {
+  #         data_wb3 <- data_wb2 %>%
+  #           mutate(!!square_name := data_wb2[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
+  #         
+  #         data_wb3
+  #       }
+  #     }
+  #     else {data_wb2}
+  #   }
+  #   else if(input$choix == "Série temporelle"){
+  #     data_wb4 <- data_wb_tab2 %>%
+  #       filter(Pays %in% input$pays & 
+  #                Année >= input$année2[[1]] &
+  #                Année <= input$année2[[2]]) %>%
+  #       arrange(Pays, Année)
+  #     
+  #     if(input$logarithme) {
+  #       if (input$carré){
+  #         data_wb5 <- data_wb4 %>%
+  #           mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb5
+  #       }
+  #       else {
+  #         data_wb5 <- data_wb4 %>%
+  #           mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
+  #         
+  #         data_wb5
+  #       }
+  #     }
+  #     else if (input$carré){
+  #       if (input$logarithme){
+  #         data_wb5 <- data_wb4 %>%
+  #           mutate(!!log_name := log(data_wb4[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb5
+  #       }
+  #       else {
+  #         data_wb5 <- data_wb4 %>%
+  #           mutate(!!square_name := data_wb4[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
+  #         
+  #         data_wb5
+  #       }
+  #     }
+  #     else {data_wb4}
+  #   }
+  #   else if(input$choix == "Données de panel"){
+  #     data_wb6 <- data_wb_tab2 %>%
+  #       filter(Pays %in% input$pays & 
+  #                Année >= input$année2[[1]] &
+  #                Année <= input$année2[[2]]) %>%
+  #       arrange(Pays, Année)
+  #     
+  #     if(input$logarithme) {
+  #       if (input$carré){
+  #         data_wb7 <- data_wb6 %>%
+  #           mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb7
+  #       }
+  #       else {
+  #         data_wb7 <- data_wb6 %>%
+  #           mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, log_name, "Année")
+  #         
+  #         data_wb7
+  #       }
+  #     }
+  #     else if (input$carré){
+  #       if (input$logarithme) {
+  #         data_wb7 <- data_wb6 %>%
+  #           mutate(!!log_name := log(data_wb6[, input$nouveau_nom])) %>%
+  #           mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, log_name, "Année")
+  #         
+  #         data_wb7
+  #       } 
+  #       else {
+  #         data_wb7 <- data_wb6 %>%
+  #           mutate(!!square_name := data_wb6[, input$nouveau_nom]^2) %>%
+  #           select("Code ISO", "Pays", input$nouveau_nom, square_name, "Année")
+  #         
+  #         data_wb7
+  #       }
+  #     }
+  #     else {data_wb6}
+  #   }
+  # },
+  # options = list(pageLength = 999999)
+  # )
+  # 
+  # 
+  # 
+  # ##### PARTIE FUSION #####
+  # 
+  # output$data_merged <- renderDataTable({
+  #   
+  # })
+  # 
 }
 
 
