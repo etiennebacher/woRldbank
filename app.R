@@ -99,13 +99,9 @@ server <- function(input, output, session) {
       }
       else{}
     }))
-    
-    
-    # après vérification, il apparaît que c'est le bloc qui suit qui pose pb puisque quand je ne laisse que la partie ci-dessus non-commentée, il n'y a pas de plantage mais dès que je rajoute le deuxième bloc (hors renderDataTable) ça plante. Le pb d'objet qui n'est pas une fonction est donc dans ce deuxième bloc.
-    
-    # apparemment, il faut définir input$choix -> comment le faire pour toutes les valeurs ? le faire dans un script à côté ?
-    
-    "input$choix1" <- NULL
+
+    # on attribue une valeur à input$choix, qui n'est pas trouvé sinon
+    assign(paste0("input$choix", i), NULL)
     
     ### INPUTS PAYS ET ANNEES
     observe({
@@ -155,217 +151,223 @@ server <- function(input, output, session) {
       }
       else{}
     })
-# 
-#     ### DONNEES AFFICHEES
-#     output[[paste0("data_imported_tab", i)]] <- renderDataTable({
-#       paste0("data_wb", i) <- paste0("data_wb_tab", i)()
-#       if (!is.null(paste0("data_wb", i))){
-#       log_name <- paste0('ln(',
-#                          paste0("input$nouveau_nom", i),
-#                          ')')
-#       square_name <- paste0(paste0("input$nouveau_nom", i),
-#                             '^2')
-# 
-# 
-#       ## Trois situations possibles : les données sont en coupe transversale, en série temporelle ou
-#       ## en données de panel.
-#       ## Dans chacune de ces trois situations, on détaille toutes les associations possibles
-#       ## de logarithme et carré, pour que l'ordre dans lequel on coche ne change rien.
-# 
-#       if(paste0("input$choix", i) == "Coupe transversale"){
-#         paste0("data_wb", i) %>%
-#           filter(Pays %in% paste0("pays", i)
-#                  & Année %in% paste0("année", i)) %>%
-#           arrange(Pays, Année)
-# 
-#         if(input$logarithme){
-#           if(input$carré){
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2
-#               ) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               select("Code ISO", "Pays", "Année", input$nouveau_nom, log_name)
-#           }
-#         }
-#         else if (input$carré){
-#           if (input$logarithme){
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-# 
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name)
-#           }
-#         }
-#         else {paste0("data_wb", i)}
-#       }
-#       else if(paste0("input$choix", i) == "Série temporelle"){
-#         paste0("data_wb", i) %>%
-#           filter(Pays %in% paste0("pays", i)  &
-#                    Année >= paste0("année2", i)[[1]] &
-#                    Année <= paste0("année2", i)[[2]]) %>%
-#           arrange(Pays, Année)
-# 
-#         if(input$logarithme) {
-#           if (input$carré){
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      log_name)
-#           }
-#         }
-#         else if (input$carré){
-#           if (input$logarithme){
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name)
-# 
-#           }
-#         }
-#         else {paste0("data_wb", i)}
-#       }
-#       else if(input$choix == "Données de panel"){
-#         paste0("data_wb", i) %>%
-#           filter(Pays %in% input$pays &
-#                    Année >= paste0("année2", i)[[1]] &
-#                    Année <= paste0("année2", i)[[2]]) %>%
-#           arrange(Pays, Année)
-# 
-#         if(input$logarithme) {
-#           if (input$carré){
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)])) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      log_name)
-#           }
-#         }
-#         else if (input$carré){
-#           if (input$logarithme) {
-#             paste0("data_wb", i) %>%
-#               mutate(!!log_name := log(paste0("data_wb", i)
-#                                        [, paste0("input$nouveau_nom", i)]
-#               )
-#               ) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name,
-#                      log_name)
-#           }
-#           else {
-#             paste0("data_wb", i) %>%
-#               mutate(!!square_name := paste0("data_wb", i)
-#                      [, paste0("input$nouveau_nom", i)]^2) %>%
-#               select("Code ISO",
-#                      "Pays",
-#                      "Année",
-#                      paste0("input$nouveau_nom", i),
-#                      square_name)
-#           }
-#         }
-#         else {paste0("data_wb", i)}
-#       }
-#     }},
-#     options = list(pageLength = 999999)
-#     )
+    
+    
+    # problème dans la partie ci-dessous : "Error in exprFunc: tentative d'appliquer un objet qui n'est pas une fonction"
+    
+    assign(paste0("data_wb", i, "$value"), 
+           get(paste0("data_wb_tab", i))
+           )
+    
+    ### DONNEES AFFICHEES
+    output[[paste0("data_imported_tab", i)]] <- renderDataTable({
+      if (!is.null(paste0("data_wb", i))){
+      log_name <- paste0('ln(',
+                         paste0("input$nouveau_nom", i),
+                         ')')
+      square_name <- paste0(paste0("input$nouveau_nom", i),
+                            '^2')
+
+
+      ## Trois situations possibles : les données sont en coupe transversale, en série temporelle ou
+      ## en données de panel.
+      ## Dans chacune de ces trois situations, on détaille toutes les associations possibles
+      ## de logarithme et carré, pour que l'ordre dans lequel on coche ne change rien.
+
+      if(paste0("input$choix", i) == "Coupe transversale"){
+        paste0("data_wb", i) %>%
+          filter(Pays %in% paste0("pays", i)
+                 & Année %in% paste0("année", i)) %>%
+          arrange(Pays, Année)
+
+        if(input$logarithme){
+          if(input$carré){
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2
+              ) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              select("Code ISO", "Pays", "Année", input$nouveau_nom, log_name)
+          }
+        }
+        else if (input$carré){
+          if (input$logarithme){
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name)
+          }
+        }
+        else {paste0("data_wb", i)}
+      }
+      else if(paste0("input$choix", i) == "Série temporelle"){
+        paste0("data_wb", i) %>%
+          filter(Pays %in% paste0("pays", i)  &
+                   Année >= paste0("année2", i)[[1]] &
+                   Année <= paste0("année2", i)[[2]]) %>%
+          arrange(Pays, Année)
+
+        if(input$logarithme) {
+          if (input$carré){
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     log_name)
+          }
+        }
+        else if (input$carré){
+          if (input$logarithme){
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name)
+
+          }
+        }
+        else {paste0("data_wb", i)}
+      }
+      else if(input$choix == "Données de panel"){
+        paste0("data_wb", i) %>%
+          filter(Pays %in% input$pays &
+                   Année >= paste0("année2", i)[[1]] &
+                   Année <= paste0("année2", i)[[2]]) %>%
+          arrange(Pays, Année)
+
+        if(input$logarithme) {
+          if (input$carré){
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)])) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     log_name)
+          }
+        }
+        else if (input$carré){
+          if (input$logarithme) {
+            paste0("data_wb", i) %>%
+              mutate(!!log_name := log(paste0("data_wb", i)
+                                       [, paste0("input$nouveau_nom", i)]
+              )
+              ) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name,
+                     log_name)
+          }
+          else {
+            paste0("data_wb", i) %>%
+              mutate(!!square_name := paste0("data_wb", i)
+                     [, paste0("input$nouveau_nom", i)]^2) %>%
+              select("Code ISO",
+                     "Pays",
+                     "Année",
+                     paste0("input$nouveau_nom", i),
+                     square_name)
+          }
+        }
+        else {paste0("data_wb", i)}
+      }
+    }},
+    options = list(pageLength = 999999)
+    )
 }
   
   ##### PARTIE INTERACTIVITE DE L'UI ##### 
