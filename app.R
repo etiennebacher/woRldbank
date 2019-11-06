@@ -12,6 +12,8 @@ library(shinysky)
 ###   hideTab() pour cacher le bouton "More"
 ### - dans l'onglet "Fusion et exportation", faire en sorte qu'on ne puisse sélectionner
 ###   que les bases déja créées
+### - utiliser la fonction "na.approx" (package zoo) pour proposer une option de remplacement 
+###   des NA par interpolation linéaire
 
 ui <- navbarPage(theme = shinytheme("flatly"), 
                  title = strong("Traitement des données de la Banque Mondiale"),
