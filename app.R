@@ -13,7 +13,8 @@ library(shinysky)
 ### - dans l'onglet "Fusion et exportation", faire en sorte qu'on ne puisse sélectionner
 ###   que les bases déja créées
 ### - utiliser la fonction "na.approx" (package zoo) pour proposer une option de remplacement 
-###   des NA par interpolation linéaire
+###   des NA par interpolation linéaire 
+###   cf (https://stackoverflow.com/questions/27920690/linear-interpolation-using-dplyr)
 
 ui <- navbarPage(theme = shinytheme("flatly"), 
                  title = strong("Traitement des données de la Banque Mondiale"),
