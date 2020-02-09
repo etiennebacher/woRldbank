@@ -22,22 +22,26 @@ source(here("fusion.R"))
 
 
 ### Comportement bizarre : à partir de 4-5 onglets, l'ordre des cases dans "Fusion" devient complètement aléatoire (?)
-### Cliquer plusieurs fois de suite sur l'onglet "Moins" ne supprime pas plusieurs tables à la suite, il faut cliquer sur un autre onglet entre chaque clic sur "Moins"
+### Cliquer plusieurs fois de suite sur l'onglet "Less" ne supprime pas plusieurs tables à la suite, il faut cliquer sur un autre onglet entre chaque clic sur "Less"
 ### Faire un bouton pour créer une variable en t-1
-### graphiques dans popup -> mettre une légende pour geom_vline
 ### corrélation entre deux variables (nouvel onglet ?)
+### un truc "select all" dans l'input pour choisir les pays + continents
+### customiser l'onglet vide pour en faire un lanceur de la présentation pour pouvoir la faire tourner quand on veut
 
+
+##### BEGINNING OF UI #####
 
 ui <- navbarPage(theme = shinytheme("sandstone"), 
                  id = "tabs",
-                 title = strong("Traitement des données de la Banque Mondiale"),
+                 title = strong(em("woRldbank"), ": facilitate the use of World Bank data"),
                  position = "static-top",
                  # setBackgroundColor(color = "Azure"),
 
                  # popup
-                 tabPanel("",
+                 tabPanel(title = "",
                           introjsUI(),
-                          popup),
+                          popup,
+                          value = "for_popup"),
                  
                  ##### ONGLET PRESENTATION #####
                  presentationTab(1),
@@ -47,40 +51,40 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                  
                  ##### ONGLETS PLUS ET MOINS #####
                  tabPanel(
-                  title = introBox(icon("plus"), "Plus",
+                  title = introBox(icon("plus"), "More",
                                    data.step = 2,
-                                   data.intro = "Pour commencer, appuyez sur ce bouton : il créera un nouvel onglet dans lequel vous pourrez remplir les caractéristiques des données que vous souhaitez importer. Vous pouvez en créer autant que vous le souhaitez."),
-                  value = "Plus"
+                                   data.intro = "Firstly, click on this button: it will create a new tab in which you can import a dataset from the World Development Indicators and define its characteristics. You can create as many as you want."),
+                  value = "More"
                 ), 
                  
                 tabPanel(
-                  title = introBox(icon("minus"), "Moins",
+                  title = introBox(icon("minus"), "Less",
                                    data.step = 3,
-                                   data.intro = "Si vous avez créé trop d'onglets, vous pouvez supprimer les derniers créés en appuyant sur ce bouton."),
-                  value = "Moins"
+                                   data.intro = "If you have created too many tabs, you can delete the lastly created ones by clicking on this button."),
+                  value = "Less"
                 )
 )
-##### FIN UI #####
+##### END OF UI #####
 
 
 server <- function(input, output, session) {
-  
-  # ajouter "local = TRUE" obligatoire, causera peut être un problème pour le déploiement
+
+  # adding "local = TRUE" is mandatory
   source(here("choice_pres.R"), local = TRUE)
     
   count <- reactiveValues(value = 0)
   tables <- reactiveValues()
   
   observeEvent(input$tabs, {
-    if (input$tabs == "Plus"){
+    if (input$tabs == "More"){
       count$value <- count$value + 1
-      name = paste0("Base ", count$value)
+      name = paste0("Dataset ", count$value)
       insertTab(inputId = "tabs",
                 tabPanel(title = name,
-                         newTab_ui(count$value), # juste mettre count$value va faire que les noms des inputs sont les memes entre onglets, sauf le numéro à la fin (1 pour l'onglet 1, 2 pour l'onglet 2, etc.)
+                         newTab_ui(count$value), 
                          value = paste0("value", count$value)
                          ), 
-                target = "Fusion et exportation", 
+                target = "Fusion and exportation", 
                 position = "before",
                 select = TRUE)
       
@@ -88,7 +92,7 @@ server <- function(input, output, session) {
       tables[[name]] <- x
     }
       
-    else if (input$tabs == "Moins") {
+    else if (input$tabs == "Less") {
       removeTab(inputId = "tabs", target = paste0("value", count$value))
       count$value <- count$value - 1
     }
@@ -103,8 +107,8 @@ server <- function(input, output, session) {
   })
   
   observe({
-    if (input$tout_select > 0) {
-      if (input$tout_select %% 2 == 0){
+    if (input$select_all > 0) {
+      if (input$select_all %% 2 == 0){
         updateCheckboxGroupInput(session=session, 
                                  inputId="to_merge",
                                  choices = names(tables),

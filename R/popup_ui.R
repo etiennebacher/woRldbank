@@ -1,13 +1,13 @@
 popup <- bsModalNoClose("window", "Window",
-               title="Voulez-vous faire le tour de l'application ?", size='small',
-               actionBttn('besoin', 
-                          'Oui', 
+               title="Would you like a presentation of the application?", size='small',
+               actionBttn('need', 
+                          'Yes', 
                           size = 'md', 
                           style = "material-flat",
                           icon = icon("check")
                           ),
-               actionBttn('pasbesoin', 
-                          'Non', 
+               actionBttn('no_need', 
+                          'No', 
                           size = 'md', 
                           style = "material-flat",
                           icon = icon("remove")
