@@ -4,4 +4,4 @@
 * choose the type of data (cross-sectional data, time series, panel data)
 * choose the countries and years  
 * generate and download a plot for each imported dataset  
-* merge the imported datasets and to export the result in ```.csv``` format
+* merge the imported datasets and export the result in ```.csv``` format
