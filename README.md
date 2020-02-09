@@ -1,2 +1,7 @@
-# shiny_app_BM
-Cette application Shiny a pour but d'importer, de traiter et d'exporter ensuite des données venant du site de la Banque Mondiale. Ceci est dans le but de pouvoir agréger des données rapidement selon le type d'étude économétrique souhaitée (coupe transversale, série temporelle, panel), les années et les pays souhaités.
+# woRldbank
+*woRldbank* est une application Shiny qui a pour but de faciliter l'utilisation des données de la Banque Mondiale dans les études économétriques. Elle permet :
+* d'importer les données de la Banque Mondiale selon leur indicateur
+* de choisir le type de données souhaité (coupe transversale, série temporelle, panel)
+* de choisir les pays et années 
+* de générer et télécharger un graphique pour chaque base importée 
+* de fusionner les bases importées puis d'exporter la base totale en format ```.csv```
