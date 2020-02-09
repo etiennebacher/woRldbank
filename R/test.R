@@ -27,6 +27,7 @@ source(here("fusion.R"))
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
 ### customiser l'onglet vide pour en faire un lanceur de la présentation pour pouvoir la faire tourner quand on veut
+### mettre deux boutons au dessus du texte dans "Presentation": un pour aller voir le code sur github, l'autre pour relancer la présentation -> OU JUSTE UN MENU DEROULANT ??
 
 
 ##### BEGINNING OF UI #####
