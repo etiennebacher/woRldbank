@@ -334,5 +334,7 @@ newTab_server <- function(input, output, session){
       ggsave(file, plot = plot_dataset(), device = device)
     }
   )
+  
+  return(data_reac)
 
 }
