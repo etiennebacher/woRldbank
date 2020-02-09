@@ -4,79 +4,78 @@ newTab_ui <- function(id){
   tagList(
     fluidRow(
       sidebarPanel(
-        tags$h3(strong("Base à importer")),
-        textInput(ns("nom_base"),
-                  "Code de la base à importer",
-                  placeholder = "Ex : NV.AGR.TOTL.ZS"),
-        textInput(ns("nouveau_nom"), 
-                  label = "Quel nom voulez-vous donner 
-                                  à la variable ?", 
-                  placeholder = "Ex : Agriculture"),
+        tags$h3(strong("Dataset to import")),
+        textInput(ns("wdi_id"),
+                  "ID of the World Development Indicator to import:",
+                  placeholder = "Ex: NV.AGR.TOTL.ZS"),
+        textInput(ns("new_name"), 
+                  label = "Give a name to the variable:", 
+                  placeholder = "Ex: Agriculture"),
         actionButton(ns("import"), 
-                     strong("Importer la base")),
+                     strong("Import the dataset")),
         br(),
         
-        tags$h3(strong("Manipulations")),
+        tags$h3(strong("Choices")),
         
-        ## Type de données
+        ## Type of data
         selectInput(
-          inputId = ns("choix"),
-          label = "Type de données désiré",
-          choices = c("Coupe transversale",
-                      "Série temporelle",
-                      "Données de panel"),
-          selected = "Coupe transversale",
+          inputId = ns("data_type"),
+          label = "Type of data:",
+          choices = c("Cross-sectional data",
+                      "Time series",
+                      "Panel data"),
+          selected = "Cross-sectional data",
           multiple = FALSE),
         
-        ## Choix du pays
-        selectizeInput(inputId = ns("pays"), 
-                       label = "Pays souhaités", 
+        ## Country choice
+        selectizeInput(inputId = ns("country"), 
+                       label = "Select the countries you want:", 
                        choices = "",
                        multiple = TRUE),
         
-        ## Choix de l'année
+        ## Year choice
         conditionalPanel(
-          condition = "input.choix == 'Coupe transversale'",
+          condition = "input.data_type == 'Cross-sectional data'",
           ns = ns,
-          selectizeInput(inputId = ns("année"), 
-                         label = "Année souhaitée", 
+          selectizeInput(inputId = ns("year"), 
+                         label = "Choose the year you want:", 
                          choices = "",
                          multiple = FALSE)
         ),
         conditionalPanel(
-          condition = "input.choix == 'Série temporelle' || input.choix == 'Données de panel'",
+          condition = "input.data_type == 'Time series' || input.data_type == 'Panel data'",
           ns = ns,
-          sliderInput(inputId = ns("année2"), 
-                      label = "Années souhaitées",
+          sliderInput(inputId = ns("year2"), 
+                      label = "Choose the years you want:",
                       min = 1,
                       max = 2,
                       value = c(1, 2),
                       sep = "")
       ),
       
-      ## Manipulations en plus
+      ## Additional choices
       checkboxInput(
-        inputId = ns("logarithme"), 
-        label = "Générer le logarithme de la variable"),
+        inputId = ns("logarithm"), 
+        label = "Compute the logarithm"),
       checkboxInput(
-        inputId = ns("carré"), 
-        label = "Générer le carré de la variable"),
+        inputId = ns("squared"), 
+        label = "Compute the squared value"),
       br(),
       actionButton(
         ns("make_plot"), 
-        "Générer un graphique"),
+        "Generate a plot"),
       width = 3
     ),
     mainPanel(
       column(width = 12,
-             busyIndicator(text = "Importation des données en cours", 
+             busyIndicator(text = "Importing data from the WDI...", 
                            wait = 0),
              dataTableOutput(ns("data_imported_tab")),
-             bsModal(ns("modal_plot"), "Représentation graphique", 
+             bsModal(ns("modal_plot"), "Graphical representation", 
                      trigger = ns("make_plot"),
                      plotOutput(ns("plot")),
-                     checkboxInput(ns("stata_style"), "Appliquer le style 'Stata'"),
-                     downloadButton(ns("download_plot"), label = "Télécharger le graphique"))
+                     checkboxInput(ns("stata_style"), "Apply Stata style"),
+                     downloadButton(ns("download_plot"), label = "Download the plot"))
     ),
     width = 9)
   )

@@ -9,36 +9,23 @@ library(shinysky)
 fusionTab <- function(id){
   ns <- NS(id)
 
-  tabPanel(title = introBox("Fusion et exportation",
+  tabPanel(title = introBox("Fusion and exportation",
                             data.step = 4,
-                            data.intro = "Une fois que vous avez importé toutes les bases souhaitées, vous pouvez les fusionner puis afficher la base complète dans cet onglet. Il sera également possible de la télécharger."),
-           value = "Fusion et exportation",
+                            data.intro = "Once you have imported all the datasets you wanted, you can merge them and display the full dataset in this tab. This merged dataset is also downloadable."),
+           value = "Fusion and exportation",
            fluidRow(
              sidebarPanel(
                checkboxGroupInput("to_merge",
-                                  label = strong("Bases à fusionner"),
+                                  label = strong("Datasets to merge"),
                                   choices = NULL),
-               actionButton("tout_select", strong("Tout sélectionner / déselectionner")),
+               actionButton("select_all", strong("Select all / Unselect all")),
                br(),
                br(),
-               actionButton("apply_merge", strong("Fusionner")),
+               actionButton("apply_merge", strong("Merge")),
                br(),
                br(),
                uiOutput("download_ui")
                ),
-             ## PRESENTATION ALTERNATIVE
-             # dropdownButton(
-             #   tags$h3("Fusionner les bases"),
-             #   selectInput(inputId = ns("choix_fusion"),
-             #               label = "Bases à fusionner :",
-             #               choices = c("Base 1", "Base 2"),
-             #               selected = "Base 1",
-             #               multiple = TRUE),
-             #   circle = TRUE, status = "primary",
-             #   icon = icon("gear"),
-             #   width = "300px",
-             #   tooltip = tooltipOptions(title = "Outils")
-             # ),
              mainPanel(
                column(12,
                       dataTableOutput("data_merged")

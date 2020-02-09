@@ -1,7 +1,7 @@
 # woRldbank
-*woRldbank* est une application Shiny qui a pour but de faciliter l'utilisation des données de la Banque Mondiale dans les études économétriques. Elle permet :
-* d'importer les données de la Banque Mondiale selon leur indicateur
-* de choisir le type de données souhaité (coupe transversale, série temporelle, panel)
-* de choisir les pays et années 
-* de générer et télécharger un graphique pour chaque base importée 
-* de fusionner les bases importées puis d'exporter la base totale en format ```.csv```
+*woRldbank* is a Shiny app that aims at facilitate the use of World Bank data for econometrics. It allows to:
+* import World Development Indicators with their ID
+* choose the type of data (cross-sectional data, time series, panel data)
+* choose the countries and years  
+* generate and download a plot for each imported dataset  
+* merge the imported datasets and to export the result in ```.csv``` format
