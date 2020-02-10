@@ -26,8 +26,6 @@ source(here("fusion.R"))
 ### Faire un bouton pour créer une variable en t-1
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
-### customiser l'onglet vide pour en faire un lanceur de la présentation pour pouvoir la faire tourner quand on veut
-### mettre deux boutons au dessus du texte dans "Presentation": un pour aller voir le code sur github, l'autre pour relancer la présentation -> OU JUSTE UN MENU DEROULANT ??
 
 
 ##### BEGINNING OF UI #####
@@ -62,7 +60,16 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                                    data.step = 3,
                                    data.intro = "If you have created too many tabs, you can delete the lastly created ones by clicking on this button."),
                   value = "Less"
-                )
+                ),
+                navbarMenu(title = "Other",
+                           tabPanel("Run the presentation",
+                                    value = "rerun"),
+                           "----",
+                           tabPanel(tagList(
+                             a("View the code on Github", 
+                               href = "https://github.com/etiennebacher/woRldbank"))
+                             )
+                           )
 )
 ##### END OF UI #####
 
@@ -71,6 +78,7 @@ server <- function(input, output, session) {
 
   # adding "local = TRUE" is mandatory
   source(here("choice_pres.R"), local = TRUE)
+  source(here("rerun_pres.R"), local = TRUE)
     
   count <- reactiveValues(value = 0)
   tables <- reactiveValues()
