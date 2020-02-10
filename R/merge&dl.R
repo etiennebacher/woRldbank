@@ -12,7 +12,7 @@ result_merged <- reactive({
   tmp <- map(input$to_merge, ~{tables[[.x]]()})
   data <- reduce(tmp, full_join, by = c("ISO Code", "Country", "Year")) %>%
     arrange("ISO Code", "Country", "Year") %>%
-    select("ISO Code", "Country", "Year", everything())
+    select("ISO Code", "Country", "Year", "Region", everything())
   round_df(data, 3)
 })
 
@@ -21,12 +21,9 @@ observeEvent(input$apply_merge, {
     result_merged()
   })
   
-  # if(!is.null(result_merged())){
-  #   output$download_ui <- renderUI({
-  #     downloadButton("download_data", "Download the full dataset")
-  #   })
-  # }
-  # else {}
+  output$download_ui <- renderUI({
+    downloadButton("download_data", "Download the full dataset")
+  })
 })
 
 output$download_data <- downloadHandler(

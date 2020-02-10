@@ -36,7 +36,6 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                  id = "tabs",
                  title = strong(em("woRldbank"), ": facilitate the use of World Bank data"),
                  position = "static-top",
-                 # setBackgroundColor(color = "Azure"),
 
                  # popup
                  tabPanel(title = "",

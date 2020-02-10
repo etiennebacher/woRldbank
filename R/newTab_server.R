@@ -7,10 +7,10 @@ newTab_server <- function(input, output, session){
     validate(
       need(input$new_name != "", "Please give a name to the variable")
     )
-    tmp <- as.data.frame(WDI(country = "all", indicator = input$wdi_id))
-    colnames(tmp) <- c("ISO Code", "Country", input$new_name, "Year")
+    tmp <- as.data.frame(WDI(country = "all", indicator = input$wdi_id, extra = TRUE))
+    colnames(tmp) <- c("iso2c", "Country", input$new_name, "Year", "ISO Code", "Region", "capital", "longitude", "latitude", "income", "lending")
     tmp %>%
-      select("ISO Code", "Country", "Year", input$new_name)
+      select("ISO Code", "Country", "Region", "Year", input$new_name)
   })
   
   ### INPUTS PAYS ET ANNEES
@@ -19,7 +19,7 @@ newTab_server <- function(input, output, session){
     if(input$data_type == "Cross-sectional data"){
       updateSelectizeInput(session, 
                            inputId = "country", 
-                           choices = unique(data_wb$Country), 
+                           choices = split(data_wb$Country, data_wb$Region), 
                            selected = NULL)
       updateSelectizeInput(session, 
                            inputId = "year", 
@@ -30,7 +30,7 @@ newTab_server <- function(input, output, session){
     else if(input$data_type == "Time series"){
       updateSelectizeInput(session, 
                            inputId = "country", 
-                           choices = unique(data_wb$Country),
+                           choices = split(data_wb$Country, data_wb$Region),
                            selected = NULL,
                            options = list(maxItems = 1))
       updateSliderInput(session,
@@ -45,7 +45,7 @@ newTab_server <- function(input, output, session){
     else if (input$data_type == "Panel data"){
       updateSelectizeInput(session, 
                            inputId = "country", 
-                           choices = unique(data_wb$Country),
+                           choices = split(data_wb$Country, data_wb$Region),
                            selected = NULL,
                            options = list(maxItems = 999999))
       updateSliderInput(session,
@@ -76,14 +76,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!log_name := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         }
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
           
           data_wb
         }
@@ -93,14 +93,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         }
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
           
           data_wb
         }
@@ -119,14 +119,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         }
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
           
           data_wb
         }
@@ -136,14 +136,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         }
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
           
           data_wb
         }
@@ -162,14 +162,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         }
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
           
           data_wb
         }
@@ -179,14 +179,14 @@ newTab_server <- function(input, output, session){
           data_wb <- data_wb %>%
             mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name), all_of(log_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
           
           data_wb
         } 
         else {
           data_wb <- data_wb %>%
             mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Year", input$new_name, all_of(square_name))
+            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
           
           data_wb
         }
