@@ -62,7 +62,16 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                                    data.step = 3,
                                    data.intro = "If you have created too many tabs, you can delete the lastly created ones by clicking on this button."),
                   value = "Less"
-                )
+                ),
+                navbarMenu(title = "Other",
+                           tabPanel("Run the presentation",
+                                    value = "rerun"),
+                           "----",
+                           tabPanel(tagList(
+                             a("View the code on Github", 
+                               href = "https://github.com/etiennebacher/woRldbank"))
+                             )
+                           )
 )
 ##### END OF UI #####
 
@@ -71,6 +80,7 @@ server <- function(input, output, session) {
 
   # adding "local = TRUE" is mandatory
   source(here("choice_pres.R"), local = TRUE)
+  source(here("rerun_pres.R"), local = TRUE)
     
   count <- reactiveValues(value = 0)
   tables <- reactiveValues()
