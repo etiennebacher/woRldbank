@@ -18,7 +18,7 @@ source(here("popup_ui.R"))
 source(here("presentation.R"))
 source(here("newTab_ui.R"))
 source(here("newTab_server.R"))
-source(here("fusion.R"))
+source(here("merge_ui.R"))
 
 
 ### Comportement bizarre : à partir de 4-5 onglets, l'ordre des cases dans "Fusion" devient complètement aléatoire (?)
@@ -32,7 +32,7 @@ source(here("fusion.R"))
 
 ui <- navbarPage(theme = shinytheme("sandstone"), 
                  id = "tabs",
-                 title = strong(em("woRldbank"), ": facilitate the use of World Bank data"),
+                 title = strong(em("woRldbank"), ": use WDI for econometrics"),
                  position = "static-top",
 
                  # popup
@@ -66,7 +66,7 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                                     value = "rerun"),
                            "----",
                            tabPanel(tagList(
-                             a("View the code on Github", 
+                             a("View the code on GitHub", 
                                href = "https://github.com/etiennebacher/woRldbank"))
                              )
                            )
@@ -131,7 +131,7 @@ server <- function(input, output, session) {
       }}
   })
   
-  source(here("merge&dl.R"), local = TRUE)
+  source(here("merge_server.R"), local = TRUE)
   
 
 }
