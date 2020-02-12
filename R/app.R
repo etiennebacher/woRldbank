@@ -23,16 +23,19 @@ source(here("merge_ui.R"))
 
 ### Comportement bizarre : à partir de 4-5 onglets, l'ordre des cases dans "Fusion" devient complètement aléatoire (?)
 ### Cliquer plusieurs fois de suite sur l'onglet "Less" ne supprime pas plusieurs tables à la suite, il faut cliquer sur un autre onglet entre chaque clic sur "Less"
-### Faire un bouton pour créer une variable en t-1
+######### Faire un bouton pour créer une variable en t-1
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
+### faire une case pour faire des moyennes sur 5 ans
 
 
 ##### BEGINNING OF UI #####
 
 ui <- navbarPage(theme = shinytheme("sandstone"), 
                  id = "tabs",
-                 title = strong(em("woRldbank"), ": use WDI for econometrics"),
+                 title = div(img(src="hex-woRldbank.png", height = '50px', width = '50px'), 
+                             strong(em("woRldbank"), ": use WDI for econometrics"),
+                             style = "position: relative; top: 50%; transform: translateY(-50%);"),
                  position = "static-top",
 
                  # popup
