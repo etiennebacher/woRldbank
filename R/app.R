@@ -2,16 +2,16 @@ library(shiny)
 library(shinythemes)
 library(shinyWidgets)
 library(shinyBS)
+library(shinysky)
+library(rintrojs)
 library(WDI)
 library(DT)
 library(dplyr)
-library(shinysky)
 library(tidyselect)
 library(ggplot2)
 library(ggthemes)
 library(purrr)
 library(here)
-library(rintrojs)
 
 source(here("popup_func.R"))
 source(here("popup_ui.R"))
@@ -27,6 +27,7 @@ source(here("merge_ui.R"))
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
 ### faire une case pour faire des moyennes sur 5 ans
+#### Mettre des need et validate pour éviter les messages d'erreur
 
 
 ##### BEGINNING OF UI #####

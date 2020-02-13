@@ -60,6 +60,14 @@ newTab_ui <- function(id){
       checkboxInput(
         inputId = ns("squared"), 
         label = "Compute the squared value"),
+      conditionalPanel(
+        condition = "input.data_type == 'Time series' || input.data_type == 'Panel data'",
+        ns = ns,
+        checkboxInput(
+          inputId = ns("lagged"),
+          label = "Compute the one-period lagged value"
+          )
+      ),
       br(),
       actionButton(
         ns("make_plot"), 

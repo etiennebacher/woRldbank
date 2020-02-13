@@ -23,7 +23,7 @@ newTab_server <- function(input, output, session){
                            selected = NULL)
       updateSelectizeInput(session, 
                            inputId = "year", 
-                           choices = unique(data_wb$Year), 
+                           choices = sort(unique(data_wb$Year)), 
                            selected = NULL,
                            options = list(maxItems = 1))
     }
@@ -64,7 +64,7 @@ newTab_server <- function(input, output, session){
     log_name <- paste0('ln(', input$new_name, ')')
     square_name <- paste0(input$new_name, '^2')
     
-    ## Three types of data: cross-sectional data, time series and panel data. In each of these three situations, we detail all possible combinations of logarithm and squared so that the order in which the checkboxes are ticked does not change anythin.
+    ## Three types of data: cross-sectional data, time series and panel data. In each of these three situations, we detail all possible combinations of logarithm and squared so that the order in which the checkboxes are ticked does not change anything.
     
     if(input$data_type == "Cross-sectional data"){
       data_wb <- data_wb  %>%
@@ -194,16 +194,30 @@ newTab_server <- function(input, output, session){
       else {data_wb}
     }
     
+    
   })
   
-  ### DONNEES AFFICHEES
+  data_reac2 <- reactive({
+    lagged_name <- paste0(input$new_name, '_lagged')
+    data_reac <- data_reac()
+    if (input$lagged){
+      data_reac2 <- data_reac %>%
+        group_by(Country) %>%
+        mutate(!!lagged_name := dplyr::lag(!!sym(input$new_name)))
+    }
+    else{
+      data_reac2 <- data_reac
+    }
+  })
+  
+  ### DISPLAYED DATASET
   output$data_imported_tab  <- renderDataTable({
-    data_reac()
+    data_reac2()
   },
   options = list(pageLength = 999999)
   )
 
-  
+  ### PLOT
   plot_dataset <- reactive({
     req(input$data_type)
     df <- data_reac()
@@ -314,7 +328,6 @@ newTab_server <- function(input, output, session){
     }
     else {x <- NULL}
   })
-
   
   observeEvent(input$make_plot, {
     output$plot <- renderPlot({

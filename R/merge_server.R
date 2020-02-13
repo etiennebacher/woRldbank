@@ -1,19 +1,10 @@
-round_df <- function(x, digits) {
-  # round all numeric variables
-  # x: data frame 
-  # digits: number of digits to round
-  numeric_columns <- sapply(x, mode) == 'numeric'
-  x[numeric_columns] <-  round(x[numeric_columns], digits)
-  x
-}
-
 result_merged <- reactive({
   req(input$to_merge)
   tmp <- map(input$to_merge, ~{tables[[.x]]()})
-  data <- reduce(tmp, full_join, by = c("ISO Code", "Country", "Year")) %>%
+  data <- reduce(tmp, full_join, by = c("ISO Code", "Country", "Year", "Region")) %>%
     arrange("ISO Code", "Country", "Year") %>%
-    select("ISO Code", "Country", "Year", "Region", everything())
-  round_df(data, 3)
+    select("ISO Code", "Country", "Year", "Region", everything()) %>%
+    mutate_if(is.numeric, round,  3)
 })
 
 observeEvent(input$apply_merge, {
@@ -28,7 +19,7 @@ observeEvent(input$apply_merge, {
 
 output$download_data <- downloadHandler(
   filename = function() {
-    paste("wb-data", Sys.Date(), ".csv", sep = "")
+    paste("wb-data-", Sys.Date(), ".csv", sep = "")
   },
   content = function(file) {
     write.csv(result_merged(), file)
