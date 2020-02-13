@@ -5,7 +5,6 @@ library(shinyBS)
 library(shinysky)
 library(rintrojs)
 library(WDI)
-library(DT)
 library(dplyr)
 library(tidyselect)
 library(ggplot2)
@@ -29,9 +28,10 @@ source(here("merge_ui.R"))
 #### Mettre des need et validate pour éviter les messages d'erreur
 
 
-##### BEGINNING OF UI #####
+############################## BEGINNING OF UI ############################## 
+#############################################################################
 
-ui <- navbarPage(theme = shinytheme("sandstone"), 
+ui <- navbarPage(theme = shinytheme("cerulean"), 
                  id = "tabs",
                  title = div(img(src="hex-woRldbank.png", height = '50px', width = '50px'), 
                              strong(em("woRldbank"), ": use WDI for econometrics"),
@@ -44,13 +44,13 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                           popup,
                           value = "for_popup"),
                  
-                 ##### ONGLET PRESENTATION #####
+                 ##### TAB PRESENTATION #####
                  presentationTab(1),
 
-                 ##### ONGLET FUSION #####
-                 fusionTab(1),
+                 ##### TAB MERGER #####
+                 mergeTab(1),
                  
-                 ##### ONGLETS PLUS ET MOINS #####
+                 ##### TABS "MORE" AND "LESS" #####
                  tabPanel(
                   title = introBox(icon("plus"), "More",
                                    data.step = 2,
@@ -64,8 +64,10 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                                    data.intro = "If you have created too many tabs, you can delete the lastly created ones by clicking on this button."),
                   value = "Less"
                 ),
+                
+                ##### TAB OTHER #####
                 navbarMenu(title = "Other",
-                           tabPanel("Run the presentation",
+                           tabPanel("Run the introduction",
                                     value = "rerun"),
                            "----",
                            tabPanel(tagList(
@@ -73,9 +75,11 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                                href = "https://github.com/etiennebacher/woRldbank"))
                              )
                            ),
+                
+                ##### FOOTER #####
                 tags$footer(
                     h5(
-                      "Created by Etienne Bacher AJOUTER LE LIEN VERS GITHUB",
+                      "Created by", tags$a(href="https://github.com/etiennebacher", "Etienne Bacher"),
                       style = "
    position:fixed;
    text-align:center;
@@ -90,14 +94,18 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                     )
                   )
 )
-##### END OF UI #####
 
+############################## END OF UI #################################### 
+#############################################################################
+
+######################### BEGINNING OF SERVER ############################### 
+#############################################################################
 
 server <- function(input, output, session) {
 
   # adding "local = TRUE" is mandatory
-  source(here("choice_pres.R"), local = TRUE)
-  source(here("rerun_pres.R"), local = TRUE)
+  source(here("intro_choice.R"), local = TRUE)
+  source(here("intro_rerun.R"), local = TRUE)
     
   count <- reactiveValues(value = 0)
   tables <- reactiveValues()
@@ -111,7 +119,7 @@ server <- function(input, output, session) {
                          newTab_ui(count$value), 
                          value = paste0("value", count$value)
                          ), 
-                target = "Fusion and exportation", 
+                target = "Merge and download", 
                 position = "before",
                 select = TRUE)
       
@@ -155,5 +163,7 @@ server <- function(input, output, session) {
 
 }
 
+############################ END OF SERVER ################################## 
+#############################################################################
 
 shinyApp(ui = ui, server = server)

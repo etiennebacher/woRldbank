@@ -6,13 +6,13 @@ library(DT)
 library(dplyr)
 library(shinysky)
 
-fusionTab <- function(id){
+mergeTab <- function(id){
   ns <- NS(id)
 
-  tabPanel(title = introBox("Fusion and exportation",
+  tabPanel(title = introBox("Merge and download",
                             data.step = 4,
                             data.intro = "Once you have imported all the datasets you wanted, you can merge them and display the full dataset in this tab. This merged dataset is also downloadable."),
-           value = "Fusion and exportation",
+           value = "Merge and download",
            fluidRow(
              sidebarPanel(
                checkboxGroupInput("to_merge",
