@@ -23,7 +23,6 @@ source(here("merge_ui.R"))
 
 ### Comportement bizarre : à partir de 4-5 onglets, l'ordre des cases dans "Fusion" devient complètement aléatoire (?)
 ### Cliquer plusieurs fois de suite sur l'onglet "Less" ne supprime pas plusieurs tables à la suite, il faut cliquer sur un autre onglet entre chaque clic sur "Less"
-######### Faire un bouton pour créer une variable en t-1
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
 ### faire une case pour faire des moyennes sur 5 ans
@@ -73,7 +72,23 @@ ui <- navbarPage(theme = shinytheme("sandstone"),
                              a("View the code on GitHub", 
                                href = "https://github.com/etiennebacher/woRldbank"))
                              )
-                           )
+                           ),
+                tags$footer(
+                    h5(
+                      "Created by Etienne Bacher AJOUTER LE LIEN VERS GITHUB",
+                      style = "
+   position:fixed;
+   text-align:center;
+   left: 0;
+   bottom: 0;
+   width:100%;
+   z-index:1000;  
+   height:30px; 
+   color: black;
+   padding: 10px;
+   background-color: #f5f5f5"
+                    )
+                  )
 )
 ##### END OF UI #####
 
