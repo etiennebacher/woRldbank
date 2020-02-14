@@ -19,13 +19,13 @@ source(here("newTab_ui.R"))
 source(here("newTab_server.R"))
 source(here("merge_ui.R"))
 
-
 ### Comportement bizarre : à partir de 4-5 onglets, l'ordre des cases dans "Fusion" devient complètement aléatoire (?)
 ### Cliquer plusieurs fois de suite sur l'onglet "Less" ne supprime pas plusieurs tables à la suite, il faut cliquer sur un autre onglet entre chaque clic sur "Less"
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
 ### faire une case pour faire des moyennes sur 5 ans
-#### Mettre des need et validate pour éviter les messages d'erreur
+#### Mettre des need et validate pour éviter les messages d'erreur -> stocker tous les indicateurs de la banque mondiale dans une base à part et checker si l'input$indicateur est dans cette base -> message d'erreur custom si non
+#### pour chaque newtab, créer le code pour reproduire les manipulations faites par l'utilisateur et stocker ce code dans une liste. Dans le dernier onglet, une fois que l'utilisateur a cliqué sur "télécharger", créer un onglet/popup pour afficher le code nécessaire pour tous refaire. Pour les graphiques, le code ne sera généré que si l'utilisateur clique sur télécharger
 
 
 ############################## BEGINNING OF UI ############################## 
@@ -92,7 +92,14 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
    padding: 10px;
    background-color: #f5f5f5"
                     )
-                  )
+                  ),
+                
+                ##### CUSTOMIZE ERROR MESSAGE #####
+                tags$style(HTML("
+    .shiny-output-error-validation {
+    color: red;
+    }
+    "))
 )
 
 ############################## END OF UI #################################### 

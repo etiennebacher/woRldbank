@@ -23,16 +23,16 @@ presentationTab <- function(id){
                          tags$li("once it is imported, choose the type of data you want and then choose the countries and time period"),
                          tags$li("choose whether you want the logarithm, squared and/or lagged value"),
                          tags$li("you may generate a plot and download it"),
-                         tags$li("if you're done, go to the tab", strong("Merger and exportation"), "and download your data; if not, generate a new tab and repeat the same steps.")
+                         tags$li("if you're done, go to the tab", strong("Merge and download"), "and download your data; if not, generate a new tab and repeat the same steps.")
                          ),
                     br(),
-                  "I was able to build this Shiny application thanks to the previous work of", tags$a(href="http://arelbundock.com/", "Vincent Arel-Bundock"), "who made the", tags$a(href="https://cran.r-project.org/web/packages/WDI/WDI.pdf", "WDI package"), ". This package allows to import the World Development Indicators with their ID and automatically reshapes them in the long format (as opposed to the wide format), which is more suited for econometrics.",
+                  "I was able to build this Shiny application thanks to the previous work of", tags$a(href="http://arelbundock.com/", "Vincent Arel-Bundock"), "who made the", tags$a(href="https://cran.r-project.org/web/packages/WDI/WDI.pdf", "WDI package."), "This package allows to import the World Development Indicators with their ID and automatically reshapes them in the long format (as opposed to the wide format), which is more suited for econometrics.",
                   br(),
                   br(),
-                  "The use of this application is quite intuitive and is explained in the introduction that you may have seen before this tab. If you have mistakenly closed the popup asking if you want to see the introduction (or if you have forgotten some info), you can launch it again with the tab", strong("Run the introduction"), "in the dropdown", strong("Other"), ".",
+                  "The use of this application is quite intuitive and is explained in the introduction that you may have seen before this tab. If you have mistakenly closed the popup asking if you want to see the introduction (or if you have forgotten some info), you can launch it again with the tab", strong("Run the introduction"), "in the dropdown", strong("Other."),
                   br(),
                   br(),
-                  "You may also see the code of this application by clicking on", strong("View the code on GitHub"), ", also in the dropdown", strong("Other"), ".",
+                  "You can see the code of this application by clicking on", strong("View the code on GitHub,"), "also in the dropdown", strong("Other"), ".",
                        style = "line-height: 1.8;
                        text-align: justify;")
                     )),

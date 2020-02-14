@@ -1,8 +1,12 @@
+# All IDs of the WDI
+all_ID_WDI <- read.csv(here("all_ID_WDI.csv"))
+
 newTab_server <- function(input, output, session){
   
   data_wb <- eventReactive(input$import, {
     validate(
-      need(input$wdi_id != "", "Please specify the ID of one of the World Development Indicators")
+      need(input$wdi_id %in% all_ID_WDI$x, 
+           "Please specify the ID of one of the World Development Indicators")
       )
     validate(
       need(input$new_name != "", "Please give a name to the variable")
