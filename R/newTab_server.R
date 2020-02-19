@@ -3,23 +3,44 @@ all_ID_WDI <- read.csv(here("all_ID_WDI.csv"))
 
 newTab_server <- function(input, output, session){
   
-  data_wb <- eventReactive(input$import, {
+  
+  #### DEFINE THE DATASET IMPORTED FOR THE FIRST TIME ####
+  #### This contains the "validate" messages, the importation of the base and the selection of columns. The two last things are embedded in a metaExpr to create the code to reproduce them.
+  data_wb1 <- metaReactive2({
+    req(input$import)
     validate(
       need(input$wdi_id %in% all_ID_WDI$x, 
            "Please specify the ID of one of the World Development Indicators")
       )
     validate(
-      need(input$new_name != "", "Please give a name to the variable")
+      need(input$new_name != "", 
+           "Please give a name to the variable")
     )
-    tmp <- as.data.frame(WDI(country = "all", indicator = input$wdi_id, extra = TRUE))
-    colnames(tmp) <- c("iso2c", "Country", input$new_name, "Year", "ISO Code", "Region", "capital", "longitude", "latitude", "income", "lending")
-    tmp %>%
-      select("ISO Code", "Country", "Region", "Year", input$new_name)
+    isolate(metaExpr({
+      tmp <- as.data.frame(WDI(country = "all", indicator = ..(input$wdi_id), extra = TRUE))
+      colnames(tmp) <- c("iso2c", "Country", ..(input$new_name), 
+                         "Year", "ISO Code", "Region", "capital", 
+                         "longitude", "latitude", "income", "lending")
+      tmp %>%
+        select("ISO Code", "Country", "Region", "Year", ..(input$new_name))
+    }))
   })
   
-  ### INPUTS PAYS ET ANNEES
+  
+  #### BUTTON TO REPRODUCE THE TABLE SHOULD APPEAR ONLY IF THE TABLE IS NOT NULL ####
+  # observe({
+  #   if(!is.null(data_wb1())){
+  #     output$new_button_code <- renderUI({
+  #       actionButton(session$ns("show_code"),
+  #                    "Show the code to reproduce this table on R",
+  #                    width = '100%')
+  #     })
+  #   }
+  # })
+  
+  ### INPUTS YEARS AND COUNTRIES ACCORDING TO THE TYPE OF DATA SELECTED ####
   observe({
-    data_wb <- data_wb()
+    data_wb <- data_wb1()
     if(input$data_type == "Cross-sectional data"){
       updateSelectizeInput(session, 
                            inputId = "country", 
@@ -63,168 +84,88 @@ newTab_server <- function(input, output, session){
     }
   })
   
-  data_reac <- reactive({
-    data_wb  <- data_wb()
-    log_name <- paste0('ln(', input$new_name, ')')
-    square_name <- paste0(input$new_name, '^2')
-    
-    ## Three types of data: cross-sectional data, time series and panel data. In each of these three situations, we detail all possible combinations of logarithm and squared so that the order in which the checkboxes are ticked does not change anything.
+  
+  #### APPLY THESE INPUTS TO THE TABLE IMPORTED ####
+  # data_reac1 <- metaReactive2({
+  data_reac1 <- reactive({
+      data_wb  <- data_wb1()
+
+    ## Three types of data: cross-sectional data, time series and panel data. 
     
     if(input$data_type == "Cross-sectional data"){
-      data_wb <- data_wb  %>%
+      data_wb  %>%
         filter(Country %in% input$country & Year %in% input$year) %>%
         arrange(Country, Year)
-      
-      if(input$logarithm){
-        if(input$squared){
-          data_wb <- data_wb %>%
-            mutate(!!log_name := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        }
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
-          
-          data_wb
-        }
-      }
-      else if (input$squared){
-        if (input$logarithm){
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        }
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
-          
-          data_wb
-        }
-      }
-      else {data_wb}
     }
     else if(input$data_type == "Time series"){
-      data_wb <- data_wb  %>%
+      data_wb  %>%
         filter(Country %in% input$country & 
                  Year >= input$year2[[1]] &
                  Year <= input$year2[[2]]) %>%
         arrange(Country, Year)
-      
-      if(input$logarithm) {
-        if (input$squared){
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        }
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
-          
-          data_wb
-        }
-      }
-      else if (input$squared){
-        if (input$logarithm){
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        }
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
-          
-          data_wb
-        }
-      }
-      else {data_wb}
     }
     else if(input$data_type == "Panel data"){
-      data_wb <- data_wb  %>%
+      data_wb  %>%
         filter(Country %in% input$country & 
                  Year >= input$year2[[1]] &
                  Year <= input$year2[[2]]) %>%
         arrange(Country, Year)
-      
-      if(input$logarithm) {
-        if (input$squared){
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        }
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(log_name))
-          
-          data_wb
-        }
       }
-      else if (input$squared){
-        if (input$logarithm) {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(log_name) := log(data_wb[, input$new_name])) %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name), all_of(log_name))
-          
-          data_wb
-        } 
-        else {
-          data_wb <- data_wb %>%
-            mutate(!!all_of(square_name) := data_wb[, input$new_name]^2) %>%
-            select("ISO Code", "Country", "Region", "Year", input$new_name, all_of(square_name))
-          
-          data_wb
-        }
-      }
-      else {data_wb}
-    }
-    
     
   })
   
+  
+  #### GENERATE THE LOGARITHM OF THE VARIABLE ####
   data_reac2 <- reactive({
+    log_name <- paste0('ln(', input$new_name, ')')
+    if (input$logarithm){
+      data_reac1() %>%
+        group_by(Country) %>%
+        mutate(!!log_name := log(!!sym(input$new_name)))
+    }
+    else{
+      data_reac1()
+    }
+  })
+  
+  #### GENERATE THE SQUARED VARIABLE ####
+  data_reac3 <- reactive({
+    square_name <- paste0(input$new_name, '^2')
+    if (input$squared){
+      data_reac2() %>%
+        group_by(Country) %>%
+        mutate(!!square_name := (!!sym(input$new_name))^2)
+    }
+    else{
+      data_reac2()
+    }
+  })
+  
+  #### GENERATE THE LAGGED VARIABLE ####
+  data_reac4 <- reactive({
     lagged_name <- paste0(input$new_name, '_lagged')
-    data_reac <- data_reac()
     if (input$lagged){
-      data_reac2 <- data_reac %>%
+      data_reac3() %>%
         group_by(Country) %>%
         mutate(!!lagged_name := dplyr::lag(!!sym(input$new_name)))
     }
     else{
-      data_reac2 <- data_reac
+      data_reac3()
     }
   })
   
-  ### DISPLAYED DATASET
+  #### DISPLAYED DATASET ####
   output$data_imported_tab  <- renderDataTable({
-    data_reac2()
+    data_reac4()
   },
   options = list(pageLength = 999999)
   )
 
-  ### PLOT
+
+  #### CREATE THE PLOT ####
   plot_dataset <- reactive({
     req(input$data_type)
-    df <- data_reac()
+    df <- data_reac1()
     if (input$data_type == "Cross-sectional data"){
       if (input$stata_style) {
         ggplot(data = df, aes(x = df[[input$new_name]])) +
@@ -333,12 +274,14 @@ newTab_server <- function(input, output, session){
     else {x <- NULL}
   })
   
+  #### SHOW THE PLOT IF THE BUTTON IS CLICKED ####
   observeEvent(input$make_plot, {
     output$plot <- renderPlot({
       plot_dataset()
     })
   })
   
+  #### DOWNLOAD THE MODIFIED TABLE ####
   output$download_plot <- downloadHandler(
     filename = function() {
       paste("wb-plot-", input$new_name, ".png", sep = "")
@@ -352,6 +295,15 @@ newTab_server <- function(input, output, session){
     }
   )
   
-  return(data_reac)
+  #### SHOW THE CODE TO REPRODUCE THE TABLE ####
+  observeEvent(input$show_code, {
+    output$rep_code <- renderPrint({
+        expandChain(data_wb1()
+                    # , data_reac1()
+                    )
+      })
+  })
+  
+  return(data_reac1)
 
 }

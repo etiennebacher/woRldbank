@@ -30,7 +30,7 @@ newTab_ui <- function(id){
         ## Country choice
         selectizeInput(inputId = ns("country"), 
                        label = "Select the countries you want:", 
-                       choices = "",
+                       choices = " ",
                        multiple = TRUE),
         
         ## Year choice
@@ -78,12 +78,21 @@ newTab_ui <- function(id){
       column(width = 12,
              busyIndicator(text = "Importing data from the WDI...", 
                            wait = 0),
+             column(4),
+             column(4, 
+                    conditionalPanel(condition = "input.import", 
+                                     ns = ns,
+                                     actionButton(ns("show_code"), "Show the code"))),
+             column(4),
              dataTableOutput(ns("data_imported_tab")),
              bsModal(ns("modal_plot"), "Graphical representation", 
                      trigger = ns("make_plot"),
                      plotOutput(ns("plot")),
                      checkboxInput(ns("stata_style"), "Apply Stata style"),
-                     downloadButton(ns("download_plot"), label = "Download the plot"))
+                     downloadButton(ns("download_plot"), label = "Download the plot")),
+             bsModal(ns("modal_code"), "Show code", 
+                     trigger = ns("show_code"),
+                     verbatimTextOutput(ns("rep_code")))
     ),
     width = 9)
   )

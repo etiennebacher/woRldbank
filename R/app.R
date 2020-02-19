@@ -3,6 +3,8 @@ library(shinythemes)
 library(shinyWidgets)
 library(shinyBS)
 library(shinysky)
+library(shinymeta)
+library(shinyAce)
 library(rintrojs)
 library(WDI)
 library(dplyr)
@@ -92,14 +94,7 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
    padding: 10px;
    background-color: #f5f5f5"
                     )
-                  ),
-                
-                ##### CUSTOMIZE ERROR MESSAGE #####
-                tags$style(HTML("
-    .shiny-output-error-validation {
-    color: red;
-    }
-    "))
+                  )
 )
 
 ############################## END OF UI #################################### 
@@ -123,14 +118,14 @@ server <- function(input, output, session) {
       name = paste0("Dataset ", count$value)
       insertTab(inputId = "tabs",
                 tabPanel(title = name,
-                         newTab_ui(count$value), 
+                         newTab_ui(paste0("x", count$value)), 
                          value = paste0("value", count$value)
                          ), 
                 target = "Merge and download", 
                 position = "before",
                 select = TRUE)
       
-      x <- callModule(newTab_server, count$value)
+      x <- callModule(newTab_server, paste0("x", count$value))
       tables[[name]] <- x
     }
       
