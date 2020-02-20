@@ -17,14 +17,15 @@ newTab_server <- function(input, output, session){
            "Please give a name to the variable")
     )
     isolate(metaExpr({
+      "# Import the raw dataset"
       tmp <- as.data.frame(WDI(country = "all", indicator = ..(input$wdi_id), extra = TRUE))
       colnames(tmp) <- c("iso2c", "Country", ..(input$new_name), 
                          "Year", "ISO Code", "Region", "capital", 
                          "longitude", "latitude", "income", "lending")
       tmp %>%
         select("ISO Code", "Country", "Region", "Year", ..(input$new_name))
-    }))
-  })
+    }, bindToReturn = TRUE))
+  }, varname = "data1")
   
   
   #### BUTTON TO REPRODUCE THE TABLE SHOULD APPEAR ONLY IF THE TABLE IS NOT NULL ####
@@ -86,73 +87,96 @@ newTab_server <- function(input, output, session){
   
   
   #### APPLY THESE INPUTS TO THE TABLE IMPORTED ####
-  # data_reac1 <- metaReactive2({
-  data_reac1 <- reactive({
-      data_wb  <- data_wb1()
-
-    ## Three types of data: cross-sectional data, time series and panel data. 
-    
+  data_reac1 <- metaReactive2({
+  
     if(input$data_type == "Cross-sectional data"){
-      data_wb  %>%
-        filter(Country %in% input$country & Year %in% input$year) %>%
-        arrange(Country, Year)
+      metaExpr({
+        "# Filter with the countries and years you want, according to the type of data you chose"
+        ..(data_wb1())  %>%
+          filter(Country %in% ..(input$country) & Year %in% ..(input$year)) %>%
+          arrange(Country, Year)
+      }, bindToReturn = TRUE)
     }
     else if(input$data_type == "Time series"){
-      data_wb  %>%
-        filter(Country %in% input$country & 
-                 Year >= input$year2[[1]] &
-                 Year <= input$year2[[2]]) %>%
-        arrange(Country, Year)
+      metaExpr({
+        ""
+        "# Filter with the countries and years you want, according to the type of data you chose"
+        ..(data_wb1())  %>%
+          filter(Country %in% ..(input$country) & 
+                   Year >= ..(input$year2)[[1]] &
+                   Year <= ..(input$year2)[[2]]) %>%
+          arrange(Country, Year)
+      }, bindToReturn = TRUE)
     }
     else if(input$data_type == "Panel data"){
-      data_wb  %>%
-        filter(Country %in% input$country & 
-                 Year >= input$year2[[1]] &
-                 Year <= input$year2[[2]]) %>%
-        arrange(Country, Year)
-      }
+      metaExpr({
+        ""
+        "# Filter with the countries and years you want, according to the type of data you chose"
+        ..(data_wb1())  %>%
+          filter(Country %in% ..(input$country) & 
+                   Year >= ..(input$year2)[[1]] &
+                   Year <= ..(input$year2)[[2]]) %>%
+          arrange(Country, Year)
+      }, bindToReturn = TRUE)
+    }
     
-  })
+  }, varname = "data2")
   
   
   #### GENERATE THE LOGARITHM OF THE VARIABLE ####
-  data_reac2 <- reactive({
-    log_name <- paste0('ln(', input$new_name, ')')
+  data_reac2 <- metaReactive2({
     if (input$logarithm){
-      data_reac1() %>%
-        group_by(Country) %>%
-        mutate(!!log_name := log(!!sym(input$new_name)))
+      metaExpr({
+        "# Generate the logarithm of the variable"
+        log_name <- paste0('ln(', ..(input$new_name), ')')
+        ..(data_reac1()) %>%
+          group_by(Country) %>%
+          mutate(!!log_name := log(!!sym(..(input$new_name))))
+      }, bindToReturn = TRUE)
     }
     else{
-      data_reac1()
+      metaExpr({
+        ..(data_reac1())
+      }, bindToReturn = TRUE)
     }
-  })
+  }, varname = "data3")
   
   #### GENERATE THE SQUARED VARIABLE ####
-  data_reac3 <- reactive({
-    square_name <- paste0(input$new_name, '^2')
+  data_reac3 <- metaReactive2({
     if (input$squared){
-      data_reac2() %>%
-        group_by(Country) %>%
-        mutate(!!square_name := (!!sym(input$new_name))^2)
+      metaExpr({
+        "# Generate the squared value of the variable"
+        square_name <- paste0(..(input$new_name), '^2')
+        ..(data_reac2()) %>%
+          group_by(Country) %>%
+          mutate(!!square_name := (!!sym(..(input$new_name)))^2)
+      }, bindToReturn = TRUE)
     }
     else{
-      data_reac2()
+      metaExpr({
+        ..(data_reac2())
+      }, bindToReturn = TRUE)
     }
-  })
+  }, varname = "data4")
   
   #### GENERATE THE LAGGED VARIABLE ####
-  data_reac4 <- reactive({
-    lagged_name <- paste0(input$new_name, '_lagged')
+  data_reac4 <- metaReactive2({
     if (input$lagged){
-      data_reac3() %>%
-        group_by(Country) %>%
-        mutate(!!lagged_name := dplyr::lag(!!sym(input$new_name)))
+      metaExpr({
+        ""
+        "# Generate the lagged value of the variable"
+        lagged_name <- paste0(..(input$new_name), '_lagged')
+        ..(data_reac3()) %>%
+          group_by(Country) %>%
+          mutate(!!lagged_name := dplyr::lag(!!sym(..(input$new_name))))
+      }, bindToReturn = TRUE)
     }
     else{
-      data_reac3()
+      metaExpr({
+        ..(data_reac3())
+      }, bindToReturn = TRUE)
     }
-  })
+  }, varname = "data5")
   
   #### DISPLAYED DATASET ####
   output$data_imported_tab  <- renderDataTable({
@@ -163,121 +187,69 @@ newTab_server <- function(input, output, session){
 
 
   #### CREATE THE PLOT ####
-  plot_dataset <- reactive({
+  plot_dataset <- metaReactive2({
     req(input$data_type)
-    df <- data_reac1()
     if (input$data_type == "Cross-sectional data"){
-      if (input$stata_style) {
-        ggplot(data = df, aes(x = df[[input$new_name]])) +
+      metaExpr({
+        ggplot(data = ..(data_reac1()), aes(x = ..(data_reac1())[[..(input$new_name)]])) +
           geom_line(stat = "density") +
-          geom_vline(aes(xintercept = mean(df[[input$new_name]], na.rm = TRUE),
+          geom_vline(aes(xintercept = mean(..(data_reac1())[[..(input$new_name)]], na.rm = TRUE),
                          color = "Mean"),
                      linetype = "dashed",
                      size = 0.6) +
-          labs(x = input$new_name,
-               title = paste0(input$new_name, "'s density")) +
-          scale_color_manual(name = "Legend", values = c(Mean = "black")) +
-          theme_stata()
-      }
-      else {
-        ggplot(data = df, aes(x = df[[input$new_name]])) +
-          geom_line(stat = "density") +
-          geom_vline(aes(xintercept = mean(df[[input$new_name]], na.rm = TRUE),
-                         color = "Mean"),
-                     linetype = "dashed",
-                     size = 0.6) +
-          labs(x = input$new_name,
-               title = paste0(input$new_name, "'s density")) +
-          scale_color_manual(name = "Legend", values = c(Mean = "black")) +
-          theme_clean()
-        
-      }
+          labs(x = ..(input$new_name),
+               title = paste0(..(input$new_name), "'s density")) +
+          scale_color_manual(name = "Legend", values = c(Mean = "black"))
+      })
     }
     else if (input$data_type == "Time series") {
-      if (input$stata_style) {
-        ggplot(data = df, aes(x = Year, y = df[[input$new_name]])) +
+      metaExpr({
+        ggplot(data = ..(data_reac1()), aes(x = Year, y = ..(data_reac1())[[..(input$new_name)]])) +
           geom_line() +
           labs(
-            y = input$new_name,
-            title = paste0(
-              input$new_name,
-              "'s evolution between ",
-              min(df$Year),
-              " and ",
-              max(df$Year),
-              ": ",
-              unique(df$Country)
+            y = ..(input$new_name),
+            title = paste0(..(input$new_name), "'s evolution between ", 
+                           min(..(data_reac1())$Year), " and ", max(..(data_reac1())$Year), ": ",
+                           unique(..(data_reac1())$Country)
             )
-          ) +
-          theme_stata()
-      }
-      else {
-        ggplot(data = df, aes(x = Year, y = df[[input$new_name]])) +
-          geom_line() +
-          labs(
-            y = input$new_name,
-            title = paste0(
-              input$new_name,
-              "'s evolution between ",
-              min(df$Year),
-              " and ",
-              max(df$Year),
-              ": ",
-              unique(df$Country)
-            )
-          ) +
-          theme_clean()
-      }
+          )
+      })
     }
     else if (input$data_type == "Panel data"){
-      if (input$stata_style) {
-        ggplot(data = df, aes(
-          x = Year,
-          y = df[[input$new_name]],
-          group = Country,
-          color = Country
-        )) +
+      metaExpr({
+        ggplot(data = ..(data_reac1()), aes(x = Year, y = ..(data_reac1())[[..(input$new_name)]],
+                                          group = Country, color = Country)) +
           geom_line() +
           labs(
-            y = input$new_name,
-            title = paste0(
-              input$new_name,
-              "'s evolution between ",
-              min(df$Year),
-              " and ",
-              max(df$Year)
-            )
-          ) +
-          theme_stata()
-      }
-      else {
-        ggplot(data = df, aes(
-          x = Year,
-          y = df[[input$new_name]],
-          group = Country,
-          color = Country
-        )) +
-          geom_line() +
-          labs(
-            y = input$new_name,
-            title = paste0(
-              input$new_name,
-              "'s evolution between ",
-              min(df$Year),
-              " and ",
-              max(df$Year)
-            )
-          ) +
-          theme_clean()
-      }
+            y = ..(input$new_name),
+            title = paste0(..(input$new_name), "'s evolution between ", 
+                           min(..(data_reac1())$Year)," and ", max(..(data_reac1())$Year))
+          )
+      })
     }
     else {x <- NULL}
+  })
+  
+  #### APPLY STATA OR R THEME ACCORDING TO THE SELECTINPUT ####
+  plot_dataset2 <- metaReactive2({
+    req(input$graph_style)
+    if(input$graph_style == "Stata"){
+      metaExpr({
+        ..(plot_dataset()) + theme_stata()
+      })
+    }
+    else if(input$graph_style == "R"){
+      metaExpr({
+        ..(plot_dataset()) + theme_clean()
+      })
+    }
+    else {}
   })
   
   #### SHOW THE PLOT IF THE BUTTON IS CLICKED ####
   observeEvent(input$make_plot, {
     output$plot <- renderPlot({
-      plot_dataset()
+      plot_dataset2()
     })
   })
   
@@ -297,11 +269,23 @@ newTab_server <- function(input, output, session){
   
   #### SHOW THE CODE TO REPRODUCE THE TABLE ####
   observeEvent(input$show_code, {
-    output$rep_code <- renderPrint({
-        expandChain(data_wb1()
-                    # , data_reac1()
-                    )
-      })
+    displayCodeModal(
+        expandChain(data_wb1(), 
+                    data_reac1(),
+                    data_reac2(),
+                    data_reac3(),
+                    data_reac4(),
+                    plot_dataset2()
+                    ),
+        title = tagList("R code to reproduce the table and the graph",
+                        br(),
+                        h6(em("Note: the code to reproduce the graph will 
+                        be displayed only if the graph is downloaded."))),
+        footer = tagList(),
+        size = "l",
+        easyClose = TRUE
+      #### ADD QUOTES FOR ALL THE PACKAGES
+      )
   })
   
   return(data_reac1)

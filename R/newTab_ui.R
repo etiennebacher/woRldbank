@@ -82,17 +82,27 @@ newTab_ui <- function(id){
              column(4, 
                     conditionalPanel(condition = "input.import", 
                                      ns = ns,
-                                     actionButton(ns("show_code"), "Show the code"))),
+                                     actionButton(ns("show_code"), 
+                                                  "Show the R code to reproduce the table and the graph"))),
              column(4),
              dataTableOutput(ns("data_imported_tab")),
              bsModal(ns("modal_plot"), "Graphical representation", 
                      trigger = ns("make_plot"),
                      plotOutput(ns("plot")),
-                     checkboxInput(ns("stata_style"), "Apply Stata style"),
-                     downloadButton(ns("download_plot"), label = "Download the plot")),
-             bsModal(ns("modal_code"), "Show code", 
-                     trigger = ns("show_code"),
-                     verbatimTextOutput(ns("rep_code")))
+                     selectInput(ns("graph_style"), 
+                                 "Style of the graph", 
+                                 choices = c("R", "Stata"),
+                                 multiple = FALSE,
+                                 selected = "R"),
+                     downloadButton(ns("download_plot"), 
+                                    label = "Download the plot")),
+             # bsModal(ns("modal_code"), "R code to reproduce the table and the graph", 
+             #         trigger = ns("show_code"),
+             #         em("Note: The code to reproduce the graph will 
+             #            be displayed only if the graph is downloaded."),
+             #         br(),
+             #         br(),
+             #         verbatimTextOutput(ns("rep_code")))
     ),
     width = 9)
   )
