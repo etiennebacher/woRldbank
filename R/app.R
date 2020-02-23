@@ -8,6 +8,7 @@ library(shinyAce)
 library(rintrojs)
 library(WDI)
 library(dplyr)
+library(tidyr)
 library(tidyselect)
 library(ggplot2)
 library(ggthemes)
@@ -26,8 +27,7 @@ source(here("merge_ui.R"))
 ### corrélation entre deux variables (nouvel onglet ?)
 ### un truc "select all" dans l'input pour choisir les pays + continents
 ### faire une case pour faire des moyennes sur 5 ans
-#### Mettre des need et validate pour éviter les messages d'erreur -> stocker tous les indicateurs de la banque mondiale dans une base à part et checker si l'input$indicateur est dans cette base -> message d'erreur custom si non
-#### pour chaque newtab, créer le code pour reproduire les manipulations faites par l'utilisateur et stocker ce code dans une liste. Dans le dernier onglet, une fois que l'utilisateur a cliqué sur "télécharger", créer un onglet/popup pour afficher le code nécessaire pour tous refaire. Pour les graphiques, le code ne sera généré que si l'utilisateur clique sur télécharger
+### il faut que supprimer un onglet supprime aussi la case correspondante dans l'onglet fusion
 
 
 ############################## BEGINNING OF UI ############################## 
@@ -56,7 +56,7 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
                  tabPanel(
                   title = introBox(icon("plus"), "More",
                                    data.step = 2,
-                                   data.intro = "Firstly, click on this button: it will create a new tab in which you can import a dataset from the World Development Indicators and define its characteristics. You can create as many as you want."),
+                                   data.intro = "Firstly, click on this button: it will create a new tab in which you can import a dataset from the World Development Indicators and define its characteristics. You may also generate a plot that represents the data you have chosen. You can create as many tabs as you want. Finally, the code to reproduce the plot and the table will be available and live-updated according to your modifications."),
                   value = "More"
                 ), 
                  
@@ -83,16 +83,16 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
                     h5(
                       "Created by", tags$a(href="https://github.com/etiennebacher", "Etienne Bacher"),
                       style = "
-   position:fixed;
-   text-align:center;
-   left: 0;
-   bottom: 0;
-   width:100%;
-   z-index:1000;  
-   height:30px; 
-   color: black;
-   padding: 10px;
-   background-color: #f5f5f5"
+                       position:fixed;
+                       text-align:center;
+                       left: 0;
+                       bottom: 0;
+                       width:100%;
+                       z-index:1000;  
+                       height:30px; 
+                       color: black;
+                       padding: 10px;
+                       background-color: #f5f5f5"
                     )
                   )
 )
@@ -115,17 +115,17 @@ server <- function(input, output, session) {
   observeEvent(input$tabs, {
     if (input$tabs == "More"){
       count$value <- count$value + 1
-      name = paste0("Dataset ", count$value)
+      name <- paste0("Dataset ", count$value)
       insertTab(inputId = "tabs",
                 tabPanel(title = name,
-                         newTab_ui(paste0("x", count$value)), 
+                         newTab_ui(paste0("tab", count$value)), 
                          value = paste0("value", count$value)
                          ), 
                 target = "Merge and download", 
                 position = "before",
                 select = TRUE)
       
-      x <- callModule(newTab_server, paste0("x", count$value))
+      x <- callModule(newTab_server, paste0("tab", count$value))
       tables[[name]] <- x
     }
       

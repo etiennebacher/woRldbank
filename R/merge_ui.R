@@ -28,6 +28,16 @@ mergeTab <- function(id){
                ),
              mainPanel(
                column(12,
+                      
+                      #### PART TO DISPLAY THE FULL CODE (PROBLEMATIC) ####
+                      # column(4),
+                      # column(4, 
+                      #        conditionalPanel(condition = "input.apply_merge", 
+                      #                         actionButton("show_full_code", 
+                      #                                      "Show the R code to reproduce 
+                      #                                       the table and the graph"))),
+                      # column(4),
+                      
                       dataTableOutput("data_merged")
                       )
                )

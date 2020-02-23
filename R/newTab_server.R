@@ -20,10 +20,10 @@ newTab_server <- function(input, output, session){
       "# Import the raw dataset"
       tmp <- as.data.frame(WDI(country = "all", indicator = ..(input$wdi_id), extra = TRUE))
       colnames(tmp) <- c("iso2c", "Country", ..(input$new_name), 
-                         "Year", "ISO Code", "Region", "capital", 
+                         "Year", "ISO_Code", "Region", "capital", 
                          "longitude", "latitude", "income", "lending")
       tmp %>%
-        select("ISO Code", "Country", "Region", "Year", ..(input$new_name))
+        select(ISO_Code, Country, Region, Year, ..(input$new_name))
     }, bindToReturn = TRUE))
   }, varname = "data1")
   
@@ -191,6 +191,7 @@ newTab_server <- function(input, output, session){
     req(input$data_type)
     if (input$data_type == "Cross-sectional data"){
       metaExpr({
+        "# Plot the data"
         ggplot(data = ..(data_reac1()), aes(x = ..(data_reac1())[[..(input$new_name)]])) +
           geom_line(stat = "density") +
           geom_vline(aes(xintercept = mean(..(data_reac1())[[..(input$new_name)]], na.rm = TRUE),
@@ -204,6 +205,7 @@ newTab_server <- function(input, output, session){
     }
     else if (input$data_type == "Time series") {
       metaExpr({
+        "# Plot the data"
         ggplot(data = ..(data_reac1()), aes(x = Year, y = ..(data_reac1())[[..(input$new_name)]])) +
           geom_line() +
           labs(
@@ -217,6 +219,7 @@ newTab_server <- function(input, output, session){
     }
     else if (input$data_type == "Panel data"){
       metaExpr({
+        "# Plot the data"
         ggplot(data = ..(data_reac1()), aes(x = Year, y = ..(data_reac1())[[..(input$new_name)]],
                                           group = Country, color = Country)) +
           geom_line() +
@@ -270,24 +273,46 @@ newTab_server <- function(input, output, session){
   #### SHOW THE CODE TO REPRODUCE THE TABLE ####
   observeEvent(input$show_code, {
     displayCodeModal(
-        expandChain(data_wb1(), 
-                    data_reac1(),
-                    data_reac2(),
-                    data_reac3(),
-                    data_reac4(),
-                    plot_dataset2()
-                    ),
-        title = tagList("R code to reproduce the table and the graph",
-                        br(),
-                        h6(em("Note: the code to reproduce the graph will 
-                        be displayed only if the graph is downloaded."))),
+        expandChain(
+          quote(library(WDI)),
+          quote(library(dplyr)),
+          quote(library(tidyselect)),
+          quote(library(ggplot2)),
+          quote(library(ggthemes)),
+          data_wb1(),
+          data_reac1(),
+          data_reac2(),
+          data_reac3(),
+          data_reac4(),
+          plot_dataset2()
+        ), 
+        title = "R code to reproduce the table and the graph",
         footer = tagList(),
         size = "l",
         easyClose = TRUE
-      #### ADD QUOTES FOR ALL THE PACKAGES
       )
   })
   
-  return(data_reac1)
+  return(
+    # list(
+    data_reac4
+    
+    ##### CHECKBOXINPUT DOES NOT DETECT THE DF IF THERE'S EXPANDCHAIN
+    # ,
+    # expandChain(
+    #   quote(library(WDI)),
+    #   quote(library(dplyr)),
+    #   quote(library(tidyselect)),
+    #   quote(library(ggplot2)),
+    #   quote(library(ggthemes)),
+    #   data_wb1(),
+    #   data_reac1(),
+    #   data_reac2(),
+    #   data_reac3(),
+    #   data_reac4(),
+    #   plot_dataset2()
+    # )
+    # )
+  )
 
 }

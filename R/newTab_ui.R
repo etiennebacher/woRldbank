@@ -83,7 +83,8 @@ newTab_ui <- function(id){
                     conditionalPanel(condition = "input.import", 
                                      ns = ns,
                                      actionButton(ns("show_code"), 
-                                                  "Show the R code to reproduce the table and the graph"))),
+                                                  "Show the R code to reproduce 
+                                                  the table and the graph"))),
              column(4),
              dataTableOutput(ns("data_imported_tab")),
              bsModal(ns("modal_plot"), "Graphical representation", 
