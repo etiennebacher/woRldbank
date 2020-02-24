@@ -5,7 +5,7 @@ newTab_server <- function(input, output, session){
   
   
   #### DEFINE THE DATASET IMPORTED FOR THE FIRST TIME ####
-  #### This contains the "validate" messages, the importation of the base and the selection of columns. The two last things are embedded in a metaExpr to create the code to reproduce them.
+  #### This contains the "validate" messages, the importation of the base and the selection of columns.
   data_wb1 <- metaReactive2({
     req(input$import)
     validate(
@@ -270,22 +270,41 @@ newTab_server <- function(input, output, session){
     }
   )
   
+  code_to_display <- reactive({
+    if(input$make_plot)
+      expandChain(
+        quote(library(WDI)),
+        quote(library(dplyr)),
+        quote(library(tidyselect)),
+        quote(library(ggplot2)),
+        quote(library(ggthemes)),
+        data_wb1(),
+        data_reac1(),
+        data_reac2(),
+        data_reac3(),
+        data_reac4(),
+        plot_dataset2()
+      )
+    else {
+      expandChain(
+        quote(library(WDI)),
+        quote(library(dplyr)),
+        quote(library(tidyselect)),
+        data_wb1(),
+        data_reac1(),
+        data_reac2(),
+        data_reac3(),
+        data_reac4()
+      )
+    }
+  })
+  
+  
+  
   #### SHOW THE CODE TO REPRODUCE THE TABLE ####
   observeEvent(input$show_code, {
     displayCodeModal(
-        expandChain(
-          quote(library(WDI)),
-          quote(library(dplyr)),
-          quote(library(tidyselect)),
-          quote(library(ggplot2)),
-          quote(library(ggthemes)),
-          data_wb1(),
-          data_reac1(),
-          data_reac2(),
-          data_reac3(),
-          data_reac4(),
-          plot_dataset2()
-        ), 
+        code_to_display(), 
         title = "R code to reproduce the table and the graph",
         footer = tagList(),
         size = "l",
