@@ -40,12 +40,24 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
                              strong(em("woRldbank"), ": use WDI for econometrics"),
                              style = "position: relative; top: 50%; transform: translateY(-50%);"),
                  position = "static-top",
+                 
 
-                 # popup
+                 # POPUP
                  tabPanel(title = "",
                           introjsUI(),
                           popup,
                           value = "for_popup"),
+                 
+                 tags$head(
+                   tags$style(HTML("
+      .shiny-output-error-validation {
+        color: red;
+        font-size: 15px;
+        text-align: center;
+        font-style: bold;
+      }
+    "))
+                 ),
                  
                  ##### TAB PRESENTATION #####
                  presentationTab(1),
@@ -70,11 +82,11 @@ ui <- navbarPage(theme = shinytheme("cerulean"),
                 
                 ##### TAB OTHER #####
                 navbarMenu(title = "Other",
-                           tabPanel("Run the introduction",
+                           tabPanel(title = div(icon("undo-alt"), "Run the introduction"),
                                     value = "rerun"),
                            "----",
                            tabPanel(tagList(
-                             a("View the code on GitHub", 
+                             a(icon("github"), "View the code on GitHub", 
                                href = "https://github.com/etiennebacher/woRldbank"))
                              )
                            ),

@@ -8,7 +8,7 @@ library(shinysky)
 
 presentationTab <- function(id){
   ns <- NS(id)
-  tabPanel(title = introBox("Presentation",
+  tabPanel(title = introBox(icon("book"), "Presentation",
                             data.step = 1,
                             data.intro = "This first tab explains the interest of this application. It only is a descriptive tab: all the actions are to be made in the other tabs."),
            fluidRow(

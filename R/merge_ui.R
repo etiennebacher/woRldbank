@@ -9,7 +9,7 @@ library(shinysky)
 mergeTab <- function(id){
   ns <- NS(id)
 
-  tabPanel(title = introBox("Merge and download",
+  tabPanel(title = introBox(icon("object-ungroup"), "Merge and download",
                             data.step = 4,
                             data.intro = "Once you have imported all the datasets you wanted, you can merge them and display the full dataset in this tab. This merged dataset is also downloadable."),
            value = "Merge and download",

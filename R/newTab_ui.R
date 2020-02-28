@@ -12,7 +12,8 @@ newTab_ui <- function(id){
                   label = "Give a name to the variable:", 
                   placeholder = "Ex: Agriculture"),
         actionButton(ns("import"), 
-                     strong("Import the dataset")),
+                     strong("Import the dataset"),
+                     icon = icon("file-import")),
         br(),
         
         tags$h3(strong("Choices")),
@@ -71,7 +72,8 @@ newTab_ui <- function(id){
       br(),
       actionButton(
         ns("make_plot"), 
-        "Generate a plot"),
+        "Generate a plot",
+        icon = icon("chart-bar")),
       width = 3
     ),
     mainPanel(
@@ -84,8 +86,13 @@ newTab_ui <- function(id){
                                      ns = ns,
                                      actionButton(ns("show_code"), 
                                                   "Show the R code to reproduce 
-                                                  the table and the graph"))),
+                                                  the table and the graph",
+                                                  icon = icon("code")))),
              column(4),
+             br(),
+             br(),
+             br(),
+             br(),
              dataTableOutput(ns("data_imported_tab")),
              bsModal(ns("modal_plot"), "Graphical representation", 
                      trigger = ns("make_plot"),
