@@ -21,12 +21,34 @@ observeEvent(input$apply_merge, {
   })
 })
 
+
+downloadname <- reactive({
+  paste0("wb-data-", Sys.Date(), ".", input$format_dl)
+})
+
+downloadcontent <- function(){
+  if(input$format_dl == "csv"){
+    write.csv(result_merged(), file = downloadname())
+  }
+  else if(input$format_dl == "xlsx"){
+    write.xlsx2(result_merged(), file = downloadname())
+  }
+  else if(input$format_dl == "dta"){
+    write_dta(result_merged(), path = downloadname())
+  }
+  else if(input$format_dl == "sav"){
+    write_sav(result_merged(), path = downloadname())
+  }
+  else if(input$format_dl == "sas7bdat"){
+    write_sas(result_merged(), path = downloadname())
+  }
+}
+
 output$download_data <- downloadHandler(
-  filename = function() {
-    paste("wb-data-", Sys.Date(), ".csv", sep = "")
-  },
-  content = function(file) {
-    write.csv(result_merged(), file)
+  filename = downloadname,
+  content = function(file){
+    downloadcontent()
+    file.copy(downloadname(), file, overwrite=T)
   }
 )
 

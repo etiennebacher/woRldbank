@@ -24,6 +24,13 @@ mergeTab <- function(id){
                actionButton("apply_merge", strong("Merge")),
                br(),
                br(),
+               selectInput("format_dl", "Choose the format", 
+                           choices = c("CSV (.csv)" = "csv", 
+                                       "Excel (.xlsx)" = "xlsx",
+                                       "Stata (.dta)" = "dta",
+                                       "SPSS (.sav)" = "sav",
+                                       "SAS (.sas7bdat)" = "sas7bdat"),
+                           multiple = FALSE),
                uiOutput("download_ui")
                ),
              mainPanel(
