@@ -5,8 +5,8 @@ account: etiennebacher
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1853301
-bundleId: 2824172
+bundleId: 2862144
 url: https://etiennebacher.shinyapps.io/woRldbank/
-when: 1582542719.08817
+when: 1583698265.76006
 asMultiple: FALSE
 asStatic: FALSE
