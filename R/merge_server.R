@@ -28,20 +28,24 @@ downloadname <- reactive({
 
 downloadcontent <- function(){
   if(input$format_dl == "csv"){
-    write.csv(result_merged(), file = downloadname())
+    content <- write.csv(result_merged(), file = downloadname())
   }
   else if(input$format_dl == "xlsx"){
-    write.xlsx2(result_merged(), file = downloadname())
+    content <- write.xlsx2(result_merged(), file = downloadname())
+  }
+  else if(input$format_dl == "rds"){
+    content <- saveRDS(result_merged(), file = downloadname())
   }
   else if(input$format_dl == "dta"){
-    write_dta(result_merged(), path = downloadname())
+    content <- write_dta(result_merged(), path = downloadname())
   }
   else if(input$format_dl == "sav"){
-    write_sav(result_merged(), path = downloadname())
+    content <- write_sav(result_merged(), path = downloadname())
   }
   else if(input$format_dl == "sas7bdat"){
-    write_sas(result_merged(), path = downloadname())
+    content <- write_sas(result_merged(), path = downloadname())
   }
+  return(content)
 }
 
 output$download_data <- downloadHandler(

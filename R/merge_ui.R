@@ -27,6 +27,7 @@ mergeTab <- function(id){
                selectInput("format_dl", "Choose the format", 
                            choices = c("CSV (.csv)" = "csv", 
                                        "Excel (.xlsx)" = "xlsx",
+                                       "R (.rds)" = "rds",
                                        "Stata (.dta)" = "dta",
                                        "SPSS (.sav)" = "sav",
                                        "SAS (.sas7bdat)" = "sas7bdat"),
